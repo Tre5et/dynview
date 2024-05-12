@@ -1,12 +1,12 @@
 package net.treset.adaptiveview.distance;
 
 import net.treset.adaptiveview.AdaptiveViewMod;
-import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.OldConfig;
 
 public class ViewDistanceHandler {
-    private final Config config;
+    private final OldConfig config;
 
-    public ViewDistanceHandler(Config config) {
+    public ViewDistanceHandler(OldConfig config) {
         this.config = config;
     }
 

@@ -25,11 +25,12 @@ public class AdaptiveViewMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("adaptiveview");
 
 	private static final Config config = Config.load();
-	private static final ConfigCommandHandler configCommandHandler = new ConfigCommandHandler(config);
-	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(config);
-	private static final LockManager lockManager = new LockManager(config, viewDistanceHandler);
-	private static final LockCommandHandler lockCommandHandler = new LockCommandHandler(config, lockManager);
-	private static final ServerTickHandler serverTickHandler = new ServerTickHandler(config, lockManager, viewDistanceHandler);
+	//TODO
+	private static final ConfigCommandHandler configCommandHandler = new ConfigCommandHandler(null);
+	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(null);
+	private static final LockManager lockManager = new LockManager(null, viewDistanceHandler);
+	private static final LockCommandHandler lockCommandHandler = new LockCommandHandler(null, lockManager);
+	private static final ServerTickHandler serverTickHandler = new ServerTickHandler(null, lockManager, viewDistanceHandler);
 	private static MinecraftServer server;
 
 	private static boolean client = false;
@@ -59,7 +60,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	}
 
 	private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandManager.RegistrationEnvironment environment) {
-		if(!environment.dedicated && !config.isOverrideClient()) return;
+		if(!environment.dedicated && !config.isAllowOnClient()) return;
 		dispatcher.register(CommandManager.literal("adaptiveview")
 				.requires(source -> source.hasPermissionLevel(2))
 				.executes(this::adaptiveview)

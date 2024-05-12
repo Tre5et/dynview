@@ -1,20 +1,20 @@
 package net.treset.adaptiveview.unlocking;
 
-import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.OldConfig;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LockManager {
-    private final Config config;
+    private final OldConfig config;
     private final ViewDistanceHandler viewDistanceHandler;
     private final List<ViewDistanceLocker> unlockers = new ArrayList<>();
     private int lockedManually = 0;
 
     private ViewDistanceLocker currentLocker = null;
 
-    public LockManager(Config config, ViewDistanceHandler viewDistanceHandler) {
+    public LockManager(OldConfig config, ViewDistanceHandler viewDistanceHandler) {
         this.config = config;
         this.viewDistanceHandler = viewDistanceHandler;
     }

@@ -2,14 +2,14 @@ package net.treset.adaptiveview.distance;
 
 import net.minecraft.server.MinecraftServer;
 import net.treset.adaptiveview.AdaptiveViewMod;
-import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.OldConfig;
 import net.treset.adaptiveview.tools.MathTools;
 import net.treset.adaptiveview.unlocking.LockManager;
 
 import java.util.*;
 
 public class ServerTickHandler {
-    private final Config config;
+    private final OldConfig config;
     private final LockManager lockManager;
     private final ViewDistanceHandler viewDistanceHandler;
 
@@ -17,7 +17,7 @@ public class ServerTickHandler {
     private final List<Long> tickLengths = new ArrayList<>();
 
 
-    public ServerTickHandler(Config config, LockManager lockManager, ViewDistanceHandler viewDistanceHandler) {
+    public ServerTickHandler(OldConfig config, LockManager lockManager, ViewDistanceHandler viewDistanceHandler) {
         this.config = config;
         this.lockManager = lockManager;
         this.viewDistanceHandler = viewDistanceHandler;

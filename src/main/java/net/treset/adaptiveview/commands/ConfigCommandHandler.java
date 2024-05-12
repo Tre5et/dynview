@@ -3,13 +3,13 @@ package net.treset.adaptiveview.commands;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
-import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.OldConfig;
 import net.treset.adaptiveview.tools.TextTools;
 
 public class ConfigCommandHandler {
-    private final Config config;
+    private final OldConfig config;
 
-    public ConfigCommandHandler(Config config) {
+    public ConfigCommandHandler(OldConfig config) {
         this.config = config;
     }
 

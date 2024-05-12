@@ -7,17 +7,17 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.AdaptiveViewMod;
-import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.OldConfig;
 import net.treset.adaptiveview.tools.TextTools;
 import net.treset.adaptiveview.unlocking.LockManager;
 import net.treset.adaptiveview.unlocking.LockReason;
 import net.treset.adaptiveview.unlocking.ViewDistanceLocker;
 
 public class LockCommandHandler {
-    private final Config config;
+    private final OldConfig config;
     private final LockManager lockManager;
 
-    public LockCommandHandler(Config config, LockManager lockManager) {
+    public LockCommandHandler(OldConfig config, LockManager lockManager) {
         this.config = config;
         this.lockManager = lockManager;
     }
