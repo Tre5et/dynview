@@ -14,7 +14,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.treset.adaptiveview.commands.ConfigCommandHandler;
 import net.treset.adaptiveview.commands.LockCommandHandler;
 import net.treset.adaptiveview.config.Config;
-import net.treset.adaptiveview.distance.ServerTickHandler;
+import net.treset.adaptiveview.distance.ServerHandler;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
 import net.treset.adaptiveview.tools.TextTools;
 import net.treset.adaptiveview.unlocking.LockManager;
@@ -27,10 +27,10 @@ public class AdaptiveViewMod implements ModInitializer {
 	private static final Config config = Config.load();
 	//TODO
 	private static final ConfigCommandHandler configCommandHandler = new ConfigCommandHandler(null);
-	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(null);
-	private static final LockManager lockManager = new LockManager(null, viewDistanceHandler);
+	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(config);
+	private static final LockManager lockManager = new LockManager(config, viewDistanceHandler);
 	private static final LockCommandHandler lockCommandHandler = new LockCommandHandler(null, lockManager);
-	private static final ServerTickHandler serverTickHandler = new ServerTickHandler(null, lockManager, viewDistanceHandler);
+	private static final ServerHandler serverHandler = new ServerHandler(config, lockManager, viewDistanceHandler);
 	private static MinecraftServer server;
 
 	private static boolean client = false;
@@ -56,7 +56,7 @@ public class AdaptiveViewMod implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> this.registerCommands(dispatcher, environment));
 
 		ServerLifecycleEvents.SERVER_STARTED.register((s) -> server = s);
-		ServerTickEvents.END_SERVER_TICK.register(serverTickHandler::onTick);
+		ServerTickEvents.END_SERVER_TICK.register(serverHandler::onTick);
 	}
 
 	private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandManager.RegistrationEnvironment environment) {

@@ -98,8 +98,8 @@ public class Rule {
 
     private boolean valueInMinMax(double value) {
         if(min != null) {
-            return min >= value && (max == null || max <= value);
-        } else return max != null && max <= value;
+            return min <= value && (max == null || max >= value);
+        } else return max != null && max >= value;
     }
 
     @Override

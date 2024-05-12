@@ -1,20 +1,20 @@
 package net.treset.adaptiveview.unlocking;
 
-import net.treset.adaptiveview.config.OldConfig;
+import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LockManager {
-    private final OldConfig config;
+    private final Config config;
     private final ViewDistanceHandler viewDistanceHandler;
     private final List<ViewDistanceLocker> unlockers = new ArrayList<>();
     private int lockedManually = 0;
 
     private ViewDistanceLocker currentLocker = null;
 
-    public LockManager(OldConfig config, ViewDistanceHandler viewDistanceHandler) {
+    public LockManager(Config config, ViewDistanceHandler viewDistanceHandler) {
         this.config = config;
         this.viewDistanceHandler = viewDistanceHandler;
     }
@@ -68,8 +68,8 @@ public class LockManager {
     }
 
     public void lock(int chunks) {
-        config.setLocked(chunks);
         viewDistanceHandler.setViewDistance(chunks);
+        config.setLocked(true);
     }
 
     public void clear() {
@@ -89,8 +89,7 @@ public class LockManager {
     public void unlock() {
         currentLocker = null;
 
-        config.setLocked(0);
-        viewDistanceHandler.addViewDistance(0);
+        config.setLocked(false);
     }
 
     public void onTick() {

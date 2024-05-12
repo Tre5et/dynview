@@ -22,6 +22,8 @@ public class Config {
     private boolean allowOnClient;
     private ArrayList<Rule> rules;
 
+    private transient boolean locked = false;
+
     public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
         this.maxViewDistance = maxViewDistance;
@@ -241,5 +243,13 @@ public class Config {
 
     public void setRules(ArrayList<Rule> rules) {
         this.rules = rules;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

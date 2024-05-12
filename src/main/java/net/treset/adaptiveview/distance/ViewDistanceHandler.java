@@ -1,40 +1,82 @@
 package net.treset.adaptiveview.distance;
 
 import net.treset.adaptiveview.AdaptiveViewMod;
-import net.treset.adaptiveview.config.OldConfig;
+import net.treset.adaptiveview.config.Config;
+import net.treset.adaptiveview.config.Rule;
+import net.treset.adaptiveview.config.ServerState;
+import net.treset.adaptiveview.tools.MathTools;
+
+import java.util.ArrayList;
 
 public class ViewDistanceHandler {
-    private final OldConfig config;
+    private final Config config;
 
-    public ViewDistanceHandler(OldConfig config) {
+    public ViewDistanceHandler(Config config) {
         this.config = config;
     }
 
-    public void updateViewDistance(long averageTicks) {
-        if(config.getLocked() != 0) return;
-        if(averageTicks / 1000000 > config.getMaxMspt()) {
-            if(averageTicks / 1000000 > config.getMaxMsptAggressive()) {
-                addViewDistance(-2);
-            } else addViewDistance(-1);
-        } else if(averageTicks / 1000000 < config.getMinMspt()) {
-            if(averageTicks / 1000000 < config.getMinMsptAggressive()) {
-                addViewDistance(2);
-            } else addViewDistance(1);
+    public int updateViewDistance(ServerState state) {
+        ArrayList<Rule> activeRules = new ArrayList<>();
+        for(Rule rule : config.getRules()) {
+            if(rule.applies(state)) {
+                activeRules.add(rule);
+                //TODO: remove
+                System.out.println(rule);
+            }
         }
-    }
 
-    public void addViewDistance(int chunks) {
-        int vd = Math.max(config.getMinViewDistance(), Math.min(config.getMaxViewDistance(), getViewDistance() + chunks));
-        if(vd == getViewDistance()) return;
-        setViewDistance(vd);
+        int maxViewDistance = Integer.MAX_VALUE;
+        int minViewDistance = 0;
+        int updateRate = Integer.MAX_VALUE;
+        int step = 0;
+        for(Rule rule : activeRules) {
+            if(rule.getMinViewDistance() != null && rule.getMaxViewDistance() < maxViewDistance) {
+                maxViewDistance = rule.getMaxViewDistance();
+            }
+            if(rule.getMinViewDistance() != null && rule.getMinViewDistance() > minViewDistance) {
+                minViewDistance = rule.getMinViewDistance();
+            }
+            if(rule.getUpdateRate() != null && rule.getUpdateRate() < updateRate) {
+                updateRate = rule.getUpdateRate();
+            }
+            if(rule.getStep() != null) {
+                if(rule.getStep() < 0 && rule.getStep() < step) {
+                    step = rule.getStep();
+                } else if(rule.getStep() > 0 && rule.getStep() > step) {
+                    step = rule.getStep();
+                }
+            }
+        }
+
+        if(maxViewDistance == Integer.MAX_VALUE) {
+            maxViewDistance = config.getMaxViewDistance();
+        }
+        if(minViewDistance == 0) {
+            minViewDistance = config.getMinViewDistance();
+        }
+        if(maxViewDistance < minViewDistance) {
+            maxViewDistance = minViewDistance;
+        }
+        if(updateRate == Integer.MAX_VALUE) {
+            updateRate = config.getUpdateRate();
+        }
+
+        int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + step, minViewDistance, maxViewDistance);
+
+        // TODO: remove
+        System.out.println(targetViewDistance + ", " + step);
+        setViewDistance(targetViewDistance);
+
+        return updateRate;
     }
 
     public void setViewDistance(int chunks) {
-        AdaptiveViewMod.getServer().getPlayerManager().setViewDistance(chunks);
+        if(!config.isLocked()) {
+            AdaptiveViewMod.getServer().getPlayerManager().setViewDistance(chunks);
+        }
     }
 
     public int getViewDistance() {
         return AdaptiveViewMod.getServer().getPlayerManager().getViewDistance();
     }
-
 }
