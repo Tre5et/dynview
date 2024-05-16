@@ -82,8 +82,12 @@ public class TextTools {
         return add;
     }
 
-    public static void replyFormatted(CommandContext<ServerCommandSource> ctx, String text, boolean broadcastToOps) {
-        ctx.getSource().sendFeedback(() -> formatText(text), broadcastToOps);
+    public static void replyFormatted(CommandContext<ServerCommandSource> ctx, boolean broadcastToOps, String text, Object... args) {
+        ctx.getSource().sendFeedback(() -> formatText(String.format(text, args)), broadcastToOps);
+    }
+
+    public static void replyFormatted(CommandContext<ServerCommandSource> ctx, String text, Object... args) {
+        replyFormatted(ctx, false, text, args);
     }
 
     public static void replyError(CommandContext<ServerCommandSource> ctx, String text) {

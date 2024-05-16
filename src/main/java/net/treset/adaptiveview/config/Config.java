@@ -85,7 +85,15 @@ public class Config {
         );
     }
 
-    public static Config load() {
+    public static Config loadOrDefault() {
+        try  {
+            return load();
+        } catch (IOException e) {
+            return generic();
+        }
+    }
+
+    public static Config load() throws IOException {
         if(!configFile.exists()) {
             return migrateOldConfig();
         }
@@ -95,7 +103,7 @@ public class Config {
             json = Files.readString(configFile.toPath());
         } catch (IOException e) {
             AdaptiveViewMod.LOGGER.warn("Failed to read config, using default", e);
-            return Config.generic();
+            throw e;
         }
 
         try {
@@ -113,7 +121,7 @@ public class Config {
             return config;
         } catch (JsonSyntaxException e) {
             AdaptiveViewMod.LOGGER.warn("Failed to parse config, using default", e);
-            return Config.generic();
+            throw new IOException("Failed to load config", e);
         }
     }
 
@@ -184,6 +192,14 @@ public class Config {
 
         AdaptiveViewMod.LOGGER.info("Migrated new config.");
         return config;
+    }
+
+    public void copy(Config config) {
+        this.updateRate = config.updateRate;
+        this.maxViewDistance = config.maxViewDistance;
+        this.minViewDistance = config.minViewDistance;
+        this.allowOnClient = config.allowOnClient;
+        this.rules = config.rules;
     }
 
     public void save() {

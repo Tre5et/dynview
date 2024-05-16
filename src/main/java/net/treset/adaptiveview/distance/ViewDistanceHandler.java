@@ -30,7 +30,7 @@ public class ViewDistanceHandler {
         int updateRate = Integer.MAX_VALUE;
         int step = 0;
         for(Rule rule : activeRules) {
-            if(rule.getMinViewDistance() != null && rule.getMaxViewDistance() < maxViewDistance) {
+            if(rule.getMaxViewDistance() != null && rule.getMaxViewDistance() < maxViewDistance) {
                 maxViewDistance = rule.getMaxViewDistance();
             }
             if(rule.getMinViewDistance() != null && rule.getMinViewDistance() > minViewDistance) {

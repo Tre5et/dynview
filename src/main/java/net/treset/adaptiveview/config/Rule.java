@@ -102,51 +102,57 @@ public class Rule {
         } else return max != null && max >= value;
     }
 
-    @Override
-    public String toString() {
+    public String toConditionString() {
         StringBuilder sb = new StringBuilder();
-        if(min != null) {
-            sb.append(min).append("<=");
+        if(min != null && max != null) {
+            sb.append(min).append(" <= ").append(type.toString().toLowerCase()).append(" <= ").append(max);
+        } else if(min != null) {
+            sb.append(type.toString().toLowerCase()).append(" >= ").append(min);
+        } else if(max != null) {
+            sb.append(type.toString().toLowerCase()).append(" <= ").append(max);
+        } else if(value != null) {
+            sb.append(type.toString().toLowerCase()).append(" = ").append(value);
         }
-        sb.append(type);
-        if(max != null) {
-            sb.append("<=").append(max);
-        }
-        if(value != null) {
-            sb.append("=").append(value);
-        }
-        sb.append(" -> ");
+        return sb.toString();
+    }
+
+    public String toActionString() {
+        StringBuilder sb = new StringBuilder();
         int len = 0;
         if(updateRate != null) {
-            sb.append("update_rate=").append(updateRate);
+            sb.append("update_rate = ").append(updateRate);
             len++;
         }
         if(step != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("step=").append(step);
+            sb.append("step = ").append(step);
             len++;
         }
         if(maxViewDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("max_view_distance=").append(maxViewDistance);
+            sb.append("max_view_distance = ").append(maxViewDistance);
             len++;
         }
         if(minViewDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("min_view_distance=").append(minViewDistance);
+            sb.append("min_view_distance = ").append(minViewDistance);
             len++;
         }
         if(len == 0) {
             sb.append("no effect");
         }
-
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return  "Condition: " + toConditionString() + "; Action: " + toActionString();
     }
 
     public RuleType getType() {
