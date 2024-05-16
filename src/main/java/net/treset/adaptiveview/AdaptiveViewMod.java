@@ -29,7 +29,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	private static final ConfigCommandHandler configCommandHandler = new ConfigCommandHandler(config);
 	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(config);
 	private static final LockManager lockManager = new LockManager(config, viewDistanceHandler);
-	private static final LockCommandHandler lockCommandHandler = new LockCommandHandler(null, lockManager);
+	private static final LockCommandHandler lockCommandHandler = new LockCommandHandler(config, lockManager);
 	private static final ServerHandler serverHandler = new ServerHandler(config, lockManager, viewDistanceHandler);
 	private static MinecraftServer server;
 
@@ -293,7 +293,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	}
 
 	private int status(CommandContext<ServerCommandSource> ctx) {
-		TextTools.replyFormatted(ctx, String.format("?iThe current view distance is ?B%s chunks", viewDistanceHandler.getViewDistance()), false);
+		TextTools.replyFormatted(ctx, String.format("The current view distance is $b%s chunks", ViewDistanceHandler.getViewDistance()), false);
 		return 1;
 	}
 }

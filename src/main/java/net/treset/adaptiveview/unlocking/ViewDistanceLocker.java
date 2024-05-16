@@ -38,28 +38,28 @@ public class ViewDistanceLocker {
             this.remainingTime--;
             if(this.remainingTime <= 0) {
                 lockManager.finishUnlocker(this);
-                TextTools.replyFormatted(ctx, String.format("?aCleared view distance lock of ?B%s chunks?B after ?B%s ticks", this.getDistance(), this.getTimeout()), true);
+                TextTools.replyFormatted(ctx, String.format("Cleared View Distance lock of ?b%s chunks?b after ?b%s ticks", this.getDistance(), this.getTimeout()), true);
             }
         } else if(this.getUnlockReason() == LockReason.PLAYER_DISCONNECT) {
              if(this.player.isDisconnected()) {
                  lockManager.finishUnlocker(this);
-                 TextTools.replyFormatted(ctx, String.format("?aCleared view distance lock of ?B%s chunks?B after ?Bplayer %s disconnected", this.getDistance(), this.player.getName().getString()), true);
+                 TextTools.replyFormatted(ctx, String.format("Cleared View Distance lock of $b%s chunks$b after $b%s disconnected", this.getDistance(), this.player.getName().getString()), true);
              }
         } else if(this.getUnlockReason() == LockReason.PLAYER_MOVE) {
             if(this.player.isDisconnected() || this.player.getPos() != this.startPos) {
                 lockManager.finishUnlocker(this);
-                TextTools.replyFormatted(ctx, String.format("?aCleared view distance lock of ?B%s chunks?B after ?Bplayer %s moved", this.getDistance(), this.player.getName().getString()), true);
+                TextTools.replyFormatted(ctx, String.format("Cleared View Distance lock of $b%s chunks$b after $b%s moved", this.getDistance(), this.player.getName().getString()), true);
             }
         }
     }
 
     public String getReasonString() {
         if(this.getUnlockReason() == LockReason.TIMEOUT) {
-            return String.format("until %s ticks have passed.", this.timeout);
+            return String.format("until $b%s ticks$b have passed", this.timeout);
         } else if(this.getUnlockReason() == LockReason.PLAYER_DISCONNECT) {
-            return String.format("until player %s disconnects", this.player.getName().getString());
+            return String.format("until $b%s disconnects$b", this.player.getName().getString());
         } else if(this.getUnlockReason() == LockReason.PLAYER_MOVE) {
-            return String.format("until player %s moves", this.player.getName().getString());
+            return String.format("until $b%s moves$b", this.player.getName().getString());
         }
         return "";
     }

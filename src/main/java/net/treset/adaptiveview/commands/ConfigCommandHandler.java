@@ -19,9 +19,9 @@ public class ConfigCommandHandler {
 
     public int list(CommandContext<ServerCommandSource> ctx) {
         TextTools.replyFormatted(ctx, "Current Configuration:");
-        TextTools.replyFormatted(ctx, "Update rate: ?B%d ticks", config.getUpdateRate());
-        TextTools.replyFormatted(ctx, "View Distance Range: ?B%d-%d chunks", config.getMinViewDistance(), config.getMaxViewDistance());
-        TextTools.replyFormatted(ctx, "?B%d Rules", config.getRules().size());
+        TextTools.replyFormatted(ctx, "Update rate: $b%d ticks", config.getUpdateRate());
+        TextTools.replyFormatted(ctx, "View Distance Range: $b%d-%d chunks", config.getMinViewDistance(), config.getMaxViewDistance());
+        TextTools.replyFormatted(ctx, "Rules: $b%s$b", config.getRules().size());
         return 1;
     }
 
@@ -89,7 +89,7 @@ public class ConfigCommandHandler {
     private int performRuleAction(CommandContext<ServerCommandSource> ctx, BiConsumer<Integer, Rule> action) {
         Integer index = ctx.getArgument("index", Integer.class);
         if(index == null || index <= 0 || index > config.getRules().size()) {
-            TextTools.replyError(ctx, "Rule of index $b" + index + "$b doesn't exist. Needs to be at most " + (config.getRules().size() - 1) + ".");
+            TextTools.replyError(ctx, "Rule at index $b" + index + "$b doesn't exist. Needs to be at most " + (config.getRules().size() - 1) + ".");
             return 0;
         }
         action.accept(index, config.getRules().get(index - 1));
@@ -116,7 +116,7 @@ public class ConfigCommandHandler {
 
     public int ruleType(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Condition type of rule $b%d$b: $b%s$b", i, r.getType());
+            TextTools.replyFormatted(ctx, "Condition Type of rule $b%d$b: $b%s$b", i, r.getType());
         });
     }
 
@@ -124,7 +124,7 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setType(type);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Condition type of rule $b%d$b to $b%s$b", i, r.getType());
+            TextTools.replyFormatted(ctx, "Set Condition Type of rule $b%d$b to $b%s$b", i, r.getType());
         });
     }
 
@@ -217,7 +217,7 @@ public class ConfigCommandHandler {
 
     public int ruleUpdateRate(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Update rate of rule $b%d$b: $b%s$b", i, r.getUpdateRate());
+            TextTools.replyFormatted(ctx, "Update Rate of rule $b%d$b: $b%s$b", i, r.getUpdateRate());
         });
     }
 
@@ -226,7 +226,7 @@ public class ConfigCommandHandler {
             Integer updateRate = ctx.getArgument("ticks", Integer.class);
             r.setUpdateRate(updateRate);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Update rate of rule $b%d$b to $b%s$b", i, r.getUpdateRate());
+            TextTools.replyFormatted(ctx, "Set Update Rate of rule $b%d$b to $b%s$b", i, r.getUpdateRate());
         });
     }
 
@@ -234,7 +234,7 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setUpdateRate(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Update rate of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Update Rate of rule $b%d$b", i);
         });
     }
 
@@ -263,7 +263,7 @@ public class ConfigCommandHandler {
 
     public int ruleStepAfter(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Step after of rule $b%d$b: $b%s$b", i, r.getStepAfter());
+            TextTools.replyFormatted(ctx, "Step After of rule $b%d$b: $b%s$b", i, r.getStepAfter());
         });
     }
 
@@ -272,7 +272,7 @@ public class ConfigCommandHandler {
             Integer step = ctx.getArgument("step_after", Integer.class);
             r.setStepAfter(step);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Step of rule $b%d$b to $b%s$b", i, r.getStepAfter());
+            TextTools.replyFormatted(ctx, "Set Step After of rule $b%d$b to $b%s$b", i, r.getStepAfter());
         });
     }
 
@@ -280,13 +280,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setStepAfter(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Step of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Step After of rule $b%d$b", i);
         });
     }
 
     public int ruleMinView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Min view distance of rule $b%d$b: $b%s$b", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Min View Distance of rule $b%d$b: $b%s$b", i, r.getMinViewDistance());
         });
     }
 
@@ -295,7 +295,7 @@ public class ConfigCommandHandler {
             Integer min = ctx.getArgument("chunks", Integer.class);
             r.setMinViewDistance(min);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Min view distance of rule $b%d$b to $b%s$b", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Set Min View Distance of rule $b%d$b to $b%s$b", i, r.getMinViewDistance());
         });
     }
 
@@ -303,13 +303,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMinViewDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Min view distance of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Min View Distance of rule $b%d$b", i);
         });
     }
 
     public int ruleMaxView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Max view distance of rule $b%d$b: $b%s$b", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Max View Distance of rule $b%d$b: $b%s$b", i, r.getMaxViewDistance());
         });
     }
 
@@ -318,7 +318,7 @@ public class ConfigCommandHandler {
             Integer max = ctx.getArgument("chunks", Integer.class);
             r.setMaxViewDistance(max);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Max view distance of rule $b%d$b to $b%s$b", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Set Max View Distance of rule $b%d$b to $b%s$b", i, r.getMaxViewDistance());
         });
     }
 
@@ -326,7 +326,7 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMaxViewDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Max view distance of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Max View Distance of rule $b%d$b", i);
         });
     }
 

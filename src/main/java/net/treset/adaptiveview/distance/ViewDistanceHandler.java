@@ -77,7 +77,7 @@ public class ViewDistanceHandler {
         }
     }
 
-    public int getViewDistance() {
+    public static int getViewDistance() {
         return AdaptiveViewMod.getServer().getPlayerManager().getViewDistance();
     }
 }
