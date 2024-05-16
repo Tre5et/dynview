@@ -140,10 +140,6 @@ public class ConfigCommandHandler {
         return setRuleType(ctx, RuleType.PLAYERS);
     }
 
-    public int ruleTypeSetPlayer(CommandContext<ServerCommandSource> ctx) {
-        return setRuleType(ctx, RuleType.PLAYER);
-    }
-
     public int ruleValue(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
            TextTools.replyFormatted(ctx, "Value of rule %d: %s", i, r.getValue());
@@ -476,10 +472,10 @@ public class ConfigCommandHandler {
         return 1;
     }
 
-    public int addPlayer(CommandContext<ServerCommandSource> ctx) {
+    public int addPlayersName(CommandContext<ServerCommandSource> ctx) {
         String name = ctx.getArgument("name", String.class);
         Rule r = new Rule(
-                RuleType.PLAYER,
+                RuleType.PLAYERS,
                 name,
                 null,
                 null,

@@ -40,13 +40,14 @@ public class Rule {
                 }
             }
             case PLAYERS -> {
-                if(!checkMinMaxValues(0, 500)) {
-                    return false;
-                }
-            }
-            case PLAYER -> {
                 if(value == null) {
-                    return false;
+                    if(!checkMinMaxValues(0, 500)) {
+                        return false;
+                    }
+                } else {
+                    if(min != null || max != null) {
+                        return false;
+                    }
                 }
             }
         }
@@ -83,12 +84,9 @@ public class Rule {
                 }
             }
             case PLAYERS -> {
-                if(valueInMinMax(serverState.getPlayers().size())) {
+                if(value != null && serverState.getPlayers().stream().map(String::toLowerCase).toList().contains(value.toLowerCase())) {
                     return true;
-                }
-            }
-            case PLAYER -> {
-                if(value != null && serverState.getPlayers().contains(value)) {
+                } else if(valueInMinMax(serverState.getPlayers().size())) {
                     return true;
                 }
             }
