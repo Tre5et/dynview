@@ -30,7 +30,7 @@ public class ConfigCommandHandler {
         try {
             config = Config.load();
         } catch (IOException e) {
-            TextTools.replyFormatted(ctx, "Failed to reload Config! Check for syntax errors.", false);
+            TextTools.replyError(ctx, "Failed to reload Config! Check for syntax errors.");
             return 0;
         }
 
@@ -89,7 +89,7 @@ public class ConfigCommandHandler {
     private int performRuleAction(CommandContext<ServerCommandSource> ctx, BiConsumer<Integer, Rule> action) {
         Integer index = ctx.getArgument("index", Integer.class);
         if(index == null || index <= 0 || index > config.getRules().size()) {
-            TextTools.replyError(ctx, "Rule of index " + index + " doesn't exist. Needs to be at most " + (config.getRules().size() - 1) + ".");
+            TextTools.replyError(ctx, "Rule of index $b" + index + "$b doesn't exist. Needs to be at most " + (config.getRules().size() - 1) + ".");
             return 0;
         }
         action.accept(index, config.getRules().get(index - 1));
@@ -97,26 +97,26 @@ public class ConfigCommandHandler {
     }
 
     public int ruleIndex(CommandContext<ServerCommandSource> ctx) {
-        return performRuleAction(ctx, (i, r) -> TextTools.replyFormatted(ctx, "Rule %d: %s", i, r));
+        return performRuleAction(ctx, (i, r) -> TextTools.replyFormatted(ctx, "Rule $b%d$b: %s", i, r));
     }
 
     public int ruleRemove(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             config.getRules().remove(i - 1);
             config.save();
-            TextTools.replyFormatted(ctx, "Removed rule %d.", i);
+            TextTools.replyFormatted(ctx, "Removed rule $b%d$b.", i);
         });
     }
 
     public int ruleCondition(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Condition of rule %d: %s", i, r.toConditionString());
+            TextTools.replyFormatted(ctx, "Condition of rule $b%d$b: %s", i, r.toConditionString());
         });
     }
 
     public int ruleType(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Condition type of rule %d: %s", i, r.getType());
+            TextTools.replyFormatted(ctx, "Condition type of rule $b%d$b: $b%s$b", i, r.getType());
         });
     }
 
@@ -124,7 +124,7 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setType(type);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Condition type of rule %d to %s", i, r.getType());
+            TextTools.replyFormatted(ctx, "Set Condition type of rule $b%d$b to $b%s$b", i, r.getType());
         });
     }
 
@@ -142,7 +142,7 @@ public class ConfigCommandHandler {
 
     public int ruleValue(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-           TextTools.replyFormatted(ctx, "Value of rule %d: %s", i, r.getValue());
+           TextTools.replyFormatted(ctx, "Value of rule $b%d$b: $b%s$b", i, r.getValue());
         });
     }
 
@@ -151,7 +151,7 @@ public class ConfigCommandHandler {
             String value = ctx.getArgument("value", String.class);
             r.setValue(value);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Value of rule %d to %s", i, r.getValue());
+            TextTools.replyFormatted(ctx, "Set Value of rule $b%d$b to $b%s$b", i, r.getValue());
         });
     }
 
@@ -159,13 +159,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setValue(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Value of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Value of rule $b%d$b", i);
         });
     }
 
     public int ruleMin(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Min value of rule %d: %s", i, r.getMin());
+            TextTools.replyFormatted(ctx, "Min value of rule $b%d$b: $b%s$b", i, r.getMin());
         });
     }
 
@@ -174,7 +174,7 @@ public class ConfigCommandHandler {
             Integer min = ctx.getArgument("min", Integer.class);
             r.setMin(min);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Min value of rule %d to %s", i, r.getMin());
+            TextTools.replyFormatted(ctx, "Set Min value of rule $b%d$b to $b%s$b", i, r.getMin());
         });
     }
 
@@ -182,13 +182,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMin(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Min value of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Min value of rule $b%d$b", i);
         });
     }
 
     public int ruleMax(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Max value of rule %d: %s", i, r.getMax());
+            TextTools.replyFormatted(ctx, "Max value of rule $b%d$b: $b%s$b", i, r.getMax());
         });
     }
 
@@ -197,7 +197,7 @@ public class ConfigCommandHandler {
             Integer max = ctx.getArgument("max", Integer.class);
             r.setMax(max);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Max value of rule %d to %s", i, r.getMax());
+            TextTools.replyFormatted(ctx, "Set Max value of rule $b%d$b to $b%s$b", i, r.getMax());
         });
     }
 
@@ -205,19 +205,19 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMax(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Max value of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Max value of rule $b%d$b", i);
         });
     }
 
     public int ruleAction(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Action of rule %d: %s", i, r.toActionString());
+            TextTools.replyFormatted(ctx, "Action of rule $b%d$b: %s", i, r.toActionString());
         });
     }
 
     public int ruleUpdateRate(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Update rate of rule %d: %s", i, r.getUpdateRate());
+            TextTools.replyFormatted(ctx, "Update rate of rule $b%d$b: $b%s$b", i, r.getUpdateRate());
         });
     }
 
@@ -226,7 +226,7 @@ public class ConfigCommandHandler {
             Integer updateRate = ctx.getArgument("ticks", Integer.class);
             r.setUpdateRate(updateRate);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Update rate of rule %d to %s", i, r.getUpdateRate());
+            TextTools.replyFormatted(ctx, "Set Update rate of rule $b%d$b to $b%s$b", i, r.getUpdateRate());
         });
     }
 
@@ -234,13 +234,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setUpdateRate(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Update rate of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Update rate of rule $b%d$b", i);
         });
     }
 
     public int ruleStep(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Step of rule %d: %s", i, r.getStep());
+            TextTools.replyFormatted(ctx, "Step of rule $b%d$b: $b%s$b", i, r.getStep());
         });
     }
 
@@ -249,7 +249,7 @@ public class ConfigCommandHandler {
             Integer step = ctx.getArgument("step", Integer.class);
             r.setStep(step);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Step of rule %d to %s", i, r.getStep());
+            TextTools.replyFormatted(ctx, "Set Step of rule $b%d$b to $b%s$b", i, r.getStep());
         });
     }
 
@@ -257,13 +257,36 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setStep(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Step of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Step of rule $b%d$b", i);
+        });
+    }
+
+    public int ruleStepAfter(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            TextTools.replyFormatted(ctx, "Step after of rule $b%d$b: $b%s$b", i, r.getStepAfter());
+        });
+    }
+
+    public int ruleSetStepAfter(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            Integer step = ctx.getArgument("step_after", Integer.class);
+            r.setStepAfter(step);
+            config.save();
+            TextTools.replyFormatted(ctx, "Set Step of rule $b%d$b to $b%s$b", i, r.getStepAfter());
+        });
+    }
+
+    public int ruleClearStepAfter(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            r.setStepAfter(null);
+            config.save();
+            TextTools.replyFormatted(ctx, "Cleared Step of rule $b%d$b", i);
         });
     }
 
     public int ruleMinView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Min view distance of rule %d: %s", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Min view distance of rule $b%d$b: $b%s$b", i, r.getMinViewDistance());
         });
     }
 
@@ -272,7 +295,7 @@ public class ConfigCommandHandler {
             Integer min = ctx.getArgument("chunks", Integer.class);
             r.setMinViewDistance(min);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Min view distance of rule %d to %s", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Set Min view distance of rule $b%d$b to $b%s$b", i, r.getMinViewDistance());
         });
     }
 
@@ -280,13 +303,13 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMinViewDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Min view distance of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Min view distance of rule $b%d$b", i);
         });
     }
 
     public int ruleMaxView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Max view distance of rule %d: %s", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Max view distance of rule $b%d$b: $b%s$b", i, r.getMaxViewDistance());
         });
     }
 
@@ -295,7 +318,7 @@ public class ConfigCommandHandler {
             Integer max = ctx.getArgument("chunks", Integer.class);
             r.setMaxViewDistance(max);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Max view distance of rule %d to %s", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Set Max view distance of rule $b%d$b to $b%s$b", i, r.getMaxViewDistance());
         });
     }
 
@@ -303,190 +326,78 @@ public class ConfigCommandHandler {
         return performRuleAction(ctx, (i, r) -> {
             r.setMaxViewDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Max view distance of rule %d", i);
+            TextTools.replyFormatted(ctx, "Cleared Max view distance of rule $b%d$b", i);
         });
     }
 
-    public int addMsptMin(CommandContext<ServerCommandSource> ctx) {
-        Integer min = ctx.getArgument("min", Integer.class);
+    private int addRule(CommandContext<ServerCommandSource> ctx, RuleType type, String value, Integer max, Integer min) {
         Rule r = new Rule(
-                RuleType.MSPT,
-                null,
-                null,
+                type,
+                value,
+                max,
                 min,
                 null,
                 null,
                 null,
+                null,
                 null
         );
         config.getRules().add(r);
         config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
+        TextTools.replyFormatted(ctx, "Added new Rule at index $b%d$b. Modify the action to make it effective.", config.getRules().size() -1);
         return 1;
+    }
+
+    public int addMsptMin(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, null, min);
     }
 
     public int addMsptMax(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.MSPT,
-                null,
-                max,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.MSPT, null, max, null);
     }
 
     public int addMsptRange(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.MSPT,
-                null,
-                max,
-                min,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.MSPT, null, max, min);
     }
 
     public int addMemoryMin(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
-        Rule r = new Rule(
-                RuleType.MEMORY,
-                null,
-                null,
-                min,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.MEMORY, null, null, min);
     }
 
     public int addMemoryMax(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.MEMORY,
-                null,
-                max,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.MEMORY, null, max, null);
     }
 
     public int addMemoryRange(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.MEMORY,
-                null,
-                max,
-                min,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.MEMORY, null, max, min);
     }
 
     public int addPlayersMin(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
-        Rule r = new Rule(
-                RuleType.PLAYERS,
-                null,
-                null,
-                min,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.PLAYERS, null, null, min);
     }
 
     public int addPlayersMax(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.PLAYERS,
-                null,
-                max,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.PLAYERS, null, max, null);
     }
 
     public int addPlayersRange(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         Integer max = ctx.getArgument("max", Integer.class);
-        Rule r = new Rule(
-                RuleType.PLAYERS,
-                null,
-                max,
-                min,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() -1);
-        return 1;
+        return addRule(ctx, RuleType.PLAYERS, null, max, min);
     }
 
     public int addPlayersName(CommandContext<ServerCommandSource> ctx) {
         String name = ctx.getArgument("name", String.class);
-        Rule r = new Rule(
-                RuleType.PLAYERS,
-                name,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-        config.getRules().add(r);
-        config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index %d. Modify the action to make it effective.", config.getRules().size() - 1);
-        return 1;
+        return addRule(ctx, RuleType.PLAYERS, name, null, null);
     }
 }

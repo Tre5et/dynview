@@ -40,6 +40,7 @@ public class ViewDistanceHandler {
                 updateRate = rule.getUpdateRate();
             }
             if(rule.getStep() != null) {
+                rule.incrementCounter();
                 if(rule.getStep() < 0 && rule.getStep() < step) {
                     step = rule.getStep();
                 } else if(rule.getStep() > 0 && rule.getStep() > step) {

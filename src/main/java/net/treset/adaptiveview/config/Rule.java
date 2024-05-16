@@ -7,17 +7,20 @@ public class Rule {
     private Integer min;
     private Integer updateRate;
     private Integer step;
+    private Integer stepAfter;
     private Integer maxViewDistance;
     private Integer minViewDistance;
     private transient boolean valid = true;
+    private transient int counter = 0;
 
-    public Rule(RuleType type, String value, Integer max, Integer min, Integer updateRate, Integer step, Integer maxViewDistance, Integer minViewDistance) {
+    public Rule(RuleType type, String value, Integer max, Integer min, Integer updateRate, Integer step, Integer stepAfter, Integer maxViewDistance, Integer minViewDistance) {
         this.type = type;
         this.value = value;
         this.max = max;
         this.min = min;
         this.updateRate = updateRate;
         this.step = step;
+        this.stepAfter = stepAfter;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
     }
@@ -103,13 +106,15 @@ public class Rule {
     public String toConditionString() {
         StringBuilder sb = new StringBuilder();
         if(min != null && max != null) {
-            sb.append(min).append(" <= ").append(type.toString().toLowerCase()).append(" <= ").append(max);
+            sb.append("$b").append(min).append(" <= ").append(type.toString().toLowerCase()).append(" <= ").append(max).append("$b");
         } else if(min != null) {
-            sb.append(type.toString().toLowerCase()).append(" >= ").append(min);
+            sb.append("$b").append(type.toString().toLowerCase()).append(" >= ").append(min).append("$b");
         } else if(max != null) {
-            sb.append(type.toString().toLowerCase()).append(" <= ").append(max);
+            sb.append("$b").append(type.toString().toLowerCase()).append(" <= ").append(max).append("$b");
         } else if(value != null) {
-            sb.append(type.toString().toLowerCase()).append(" = ").append(value);
+            sb.append("$b").append(type.toString().toLowerCase()).append(" = ").append(value).append("$b");
+        } else {
+            sb.append("$b").append(type.toString().toLowerCase()).append("$b");
         }
         return sb.toString();
     }
@@ -118,39 +123,47 @@ public class Rule {
         StringBuilder sb = new StringBuilder();
         int len = 0;
         if(updateRate != null) {
-            sb.append("update_rate = ").append(updateRate);
+            sb.append("$bupdate_rate = ").append(updateRate).append("$b");
             len++;
         }
         if(step != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("step = ").append(step);
+            sb.append("$bstep = ").append(step).append("$b");
             len++;
+
+            if(stepAfter != null) {
+                sb.append(", $bstep_after = ").append(stepAfter).append("$b");
+            }
         }
         if(maxViewDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("max_view_distance = ").append(maxViewDistance);
+            sb.append("$bmax_view_distance = ").append(maxViewDistance).append("$b");
             len++;
         }
         if(minViewDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("min_view_distance = ").append(minViewDistance);
+            sb.append("$bmin_view_distance = ").append(minViewDistance).append("$b");
             len++;
         }
         if(len == 0) {
-            sb.append("no effect");
+            sb.append("$bno action").append("$b");
         }
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        return  "Condition: " + toConditionString() + "; Action: " + toActionString();
+        String str = "Condition: " + toConditionString() + "; Action: " + toActionString();
+        if(!valid) {
+            str += " $R($bIneffective!$b)$W";
+        }
+        return str;
     }
 
     public RuleType getType() {
@@ -159,6 +172,7 @@ public class Rule {
 
     public void setType(RuleType type) {
         this.type = type;
+        isEffective();
     }
 
     public String getValue() {
@@ -167,6 +181,7 @@ public class Rule {
 
     public void setValue(String value) {
         this.value = value;
+        isEffective();
     }
 
     public Integer getMax() {
@@ -175,6 +190,7 @@ public class Rule {
 
     public void setMax(Integer max) {
         this.max = max;
+        isEffective();
     }
 
     public Integer getMin() {
@@ -183,6 +199,7 @@ public class Rule {
 
     public void setMin(Integer min) {
         this.min = min;
+        isEffective();
     }
 
     public Integer getUpdateRate() {
@@ -191,14 +208,30 @@ public class Rule {
 
     public void setUpdateRate(Integer updateRate) {
         this.updateRate = updateRate;
+        isEffective();
+    }
+
+    public void incrementCounter() {
+        counter++;
     }
 
     public Integer getStep() {
+        if(stepAfter != null && counter % stepAfter != 0) return 0;
         return step;
     }
 
     public void setStep(Integer step) {
         this.step = step;
+        isEffective();
+    }
+
+    public Integer getStepAfter() {
+        return stepAfter;
+    }
+
+    public void setStepAfter(Integer stepAfter) {
+        this.stepAfter = stepAfter;
+        isEffective();
     }
 
     public Integer getMaxViewDistance() {
@@ -207,6 +240,7 @@ public class Rule {
 
     public void setMaxViewDistance(Integer maxViewDistance) {
         this.maxViewDistance = maxViewDistance;
+        isEffective();
     }
 
     public Integer getMinViewDistance() {
@@ -215,5 +249,6 @@ public class Rule {
 
     public void setMinViewDistance(Integer minViewDistance) {
         this.minViewDistance = minViewDistance;
+        isEffective();
     }
 }

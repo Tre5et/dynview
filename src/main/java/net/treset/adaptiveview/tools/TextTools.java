@@ -19,24 +19,29 @@ public class TextTools {
         MutableText out = Text.literal("");
 
         for(int i = 0; i < text.length(); i++) {
-            if(text.charAt(i) != '?') continue;
+            if(text.charAt(i) != '$') continue;
 
-            if(text.charAt(i + 1) == 'I') {
+            if(text.charAt(i + 1) == 'i') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 italic = !italic;
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'B') {
+            else if(text.charAt(i + 1) == 'b') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 bold = !bold;
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'U') {
+            else if(text.charAt(i + 1) == 'u') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 underline = !underline;
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'i') {
+            else if(text.charAt(i + 1) == 'R') {
+                out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
+                color = TextColor.fromFormatting(Formatting.RED);
+                lastSplitIndex = i + 2;
+            }
+            else if(text.charAt(i + 1) == 'N') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 color = TextColor.fromFormatting(Formatting.GRAY);
                 lastSplitIndex = i + 2;
@@ -46,7 +51,7 @@ public class TextTools {
                 color = TextColor.fromFormatting(Formatting.DARK_GREEN);
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'p') {
+            else if(text.charAt(i + 1) == 'P') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 color = TextColor.fromFormatting(Formatting.DARK_PURPLE);
                 lastSplitIndex = i + 2;
@@ -56,12 +61,12 @@ public class TextTools {
                 color = TextColor.fromFormatting(Formatting.GOLD);
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'a') {
+            else if(text.charAt(i + 1) == 'A') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 color = TextColor.fromFormatting(Formatting.DARK_AQUA);
                 lastSplitIndex = i + 2;
             }
-            else if(text.charAt(i + 1) == 'w') {
+            else if(text.charAt(i + 1) == 'W') {
                 out.append(applyFormatting(text.substring(lastSplitIndex, i), italic, bold, underline, color));
                 color = TextColor.fromFormatting(Formatting.WHITE);
                 lastSplitIndex = i + 2;

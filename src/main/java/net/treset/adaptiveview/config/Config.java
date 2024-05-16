@@ -47,6 +47,7 @@ public class Config {
                             null,
                             -2,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -56,6 +57,7 @@ public class Config {
                             50,
                             null,
                             -1,
+                            null,
                             null,
                             null
                     ),
@@ -67,6 +69,7 @@ public class Config {
                             null,
                             1,
                             null,
+                            null,
                             null
 
                     ),
@@ -77,6 +80,7 @@ public class Config {
                             null,
                             null,
                             2,
+                            null,
                             null,
                             null
 
@@ -151,6 +155,7 @@ public class Config {
                             null,
                             -2,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -160,6 +165,7 @@ public class Config {
                             oldConfig.getMaxMspt(),
                             null,
                             -1,
+                            null,
                             null,
                             null
                     ),
@@ -171,6 +177,7 @@ public class Config {
                             null,
                             1,
                             null,
+                            null,
                             null
 
                     ),
@@ -181,6 +188,7 @@ public class Config {
                             null,
                             null,
                             2,
+                            null,
                             null,
                             null
 
