@@ -2,10 +2,15 @@ package net.treset.adaptiveview.tools;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
+import net.treset.adaptiveview.AdaptiveViewMod;
+
+import java.util.List;
+import java.util.function.Function;
 
 public class TextTools {
     public static MutableText formatText(String text) {
@@ -97,5 +102,20 @@ public class TextTools {
 
     public static void replyError(CommandContext<ServerCommandSource> ctx, String text) {
         ctx.getSource().sendError(Text.literal(text));
+    }
+
+    public static void sendMessage(Function<ServerPlayerEntity, Boolean> shouldSend, String message, Object... args) {
+        Text formated = formatText(String.format(message, args));
+
+        List<ServerPlayerEntity> players = AdaptiveViewMod.getServer().getPlayerManager().getPlayerList();
+        for(ServerPlayerEntity player : players) {
+            if(shouldSend.apply(player)) {
+                player.sendMessage(formated);
+            }
+        }
+    }
+
+    public static boolean containsIgnoreCase(List<String> list, String str) {
+        return list.stream().map(String::toLowerCase).toList().contains(str.toLowerCase());
     }
 }

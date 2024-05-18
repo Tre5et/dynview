@@ -5,8 +5,10 @@ import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
 import net.treset.adaptiveview.config.ServerState;
 import net.treset.adaptiveview.tools.MathTools;
+import net.treset.adaptiveview.tools.TextTools;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ViewDistanceHandler {
     private final Config config;
@@ -17,11 +19,12 @@ public class ViewDistanceHandler {
 
     public int updateViewDistance(ServerState state) {
         ArrayList<Rule> activeRules = new ArrayList<>();
-        for(Rule rule : config.getRules()) {
+        ArrayList<Integer> activeIndexes = new ArrayList<>();
+        for(int i = 0; i < config.getRules().size(); i++) {
+            Rule rule = config.getRules().get(i);
             if(rule.applies(state)) {
                 activeRules.add(rule);
-                //TODO: remove
-                System.out.println(rule);
+                activeIndexes.add(i + 1);
             }
         }
 
@@ -64,11 +67,32 @@ public class ViewDistanceHandler {
 
         int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + step, minViewDistance, maxViewDistance);
 
-        // TODO: remove
-        System.out.println(targetViewDistance + ", " + step);
-        setViewDistance(targetViewDistance);
+        if(targetViewDistance != state.getCurrentViewDistance()) {
+            TextTools.sendMessage((p) -> {
+                if(config.isBroadcastToOps() && AdaptiveViewMod.getServer().getPlayerManager().isOperator(p.getGameProfile())) {
+                    return true;
+                } else return TextTools.containsIgnoreCase(config.getBroadcastTo(), p.getName().getString());
+            }, "$N$i[AdaptiveView] Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(activeIndexes));
+            setViewDistance(targetViewDistance);
+        }
 
         return updateRate;
+    }
+
+    private String getRuleCauseString(List<Integer> activeIndexes) {
+        if(activeIndexes.isEmpty()) {
+            return "no Rules";
+        }
+        if(activeIndexes.size() == 1) {
+            return "Rule " + activeIndexes.get(0);
+        }
+        StringBuilder sb = new StringBuilder("Rules ");
+        sb.append(activeIndexes.get(0));
+        for(int i = 1; i < activeIndexes.size() - 1; i++) {
+            sb.append(", ").append(activeIndexes.get(i));
+        }
+        sb.append(" and ").append(activeIndexes.get(activeIndexes.size() - 1));
+        return sb.toString();
     }
 
     public void setViewDistance(int chunks) {

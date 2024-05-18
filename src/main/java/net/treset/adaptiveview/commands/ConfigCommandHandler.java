@@ -2,6 +2,8 @@ package net.treset.adaptiveview.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
 import net.treset.adaptiveview.config.RuleType;
@@ -22,6 +24,63 @@ public class ConfigCommandHandler {
         TextTools.replyFormatted(ctx, "Update rate: $b%d ticks", config.getUpdateRate());
         TextTools.replyFormatted(ctx, "View Distance Range: $b%d-%d chunks", config.getMinViewDistance(), config.getMaxViewDistance());
         TextTools.replyFormatted(ctx, "Rules: $b%s$b", config.getRules().size());
+        return 1;
+    }
+
+    public int notifications(CommandContext<ServerCommandSource> ctx) {
+        ServerPlayerEntity player = ctx.getSource().getPlayer();
+        if(player == null) {
+            TextTools.replyError(ctx, "Error getting player from command context!");
+            return 0;
+        }
+        String status;
+        if(TextTools.containsIgnoreCase(config.getBroadcastTo(), player.getName().getString())) {
+            if(config.isBroadcastToOps() &&  AdaptiveViewMod.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
+                status = "You are subscribed to notifications and are receiving them because you are an operator.";
+            } else {
+                status = "You are subscribed to notifications.";
+            }
+        } else {
+            if(config.isBroadcastToOps() &&  AdaptiveViewMod.getServer().getPlayerManager().isOperator(player.getGameProfile())) {
+                status = "You are not subscribed to notifications but are receiving them because you are an operator.";
+            } else {
+                status = "You are not subscribed to notifications.";
+            }
+        }
+
+        TextTools.replyFormatted(ctx, status);
+        return 1;
+    }
+
+    public int notificationsSubscribe(CommandContext<ServerCommandSource> ctx) {
+        ServerPlayerEntity player = ctx.getSource().getPlayer();
+        if(player == null) {
+            TextTools.replyError(ctx, "Error getting player from command context!");
+            return 0;
+        }
+
+        if(TextTools.containsIgnoreCase(config.getBroadcastTo(), player.getName().getString())) {
+            TextTools.replyFormatted(ctx, "You are already subscribed to notifications.");
+        } else {
+            config.getBroadcastTo().add(player.getName().getString().toLowerCase());
+            TextTools.replyFormatted(ctx, "Subscribed to notifications.");
+        }
+        return 1;
+    }
+
+    public int notificationsUnsubscribe(CommandContext<ServerCommandSource> ctx) {
+        ServerPlayerEntity player = ctx.getSource().getPlayer();
+        if(player == null) {
+            TextTools.replyError(ctx, "Error getting player from command context!");
+            return 0;
+        }
+
+        if(TextTools.containsIgnoreCase(config.getBroadcastTo(), player.getName().getString())) {
+            config.getBroadcastTo().remove(player.getName().getString().toLowerCase());
+            TextTools.replyFormatted(ctx, "Unsubscribed from notifications.");
+        } else {
+            TextTools.replyFormatted(ctx, "You already aren't subscribed to notifications.");
+        }
         return 1;
     }
 
@@ -75,6 +134,31 @@ public class ConfigCommandHandler {
         config.setMinViewDistance(chunks);
         config.save();
         TextTools.replyFormatted(ctx, "Set Min View Distance to ?B%s chunks", config.getMinViewDistance());
+        return 1;
+    }
+
+    public int broadcast(CommandContext<ServerCommandSource> ctx) {
+        TextTools.replyFormatted(ctx, config.isBroadcastToOps() ? "Broadcast to Operators is enabled": "Broadcast to Ops is disabled");
+        return 1;
+    }
+
+    public int broadcastEnable(CommandContext<ServerCommandSource> ctx) {
+        if(config.isBroadcastToOps()) {
+            TextTools.replyFormatted(ctx, "Broadcast to Operators is already enabled");
+        } else {
+            config.setBroadcastToOps(true);
+            TextTools.replyFormatted(ctx, "Enabled Broadcast to Operators");
+        }
+        return 1;
+    }
+
+    public int broadcastDisable(CommandContext<ServerCommandSource> ctx) {
+        if(config.isBroadcastToOps()) {
+            config.setBroadcastToOps(false);
+            TextTools.replyFormatted(ctx, "Disabled Broadcast to Operators");
+        } else {
+            TextTools.replyFormatted(ctx, "Broadcast to Operators is already disabled");
+        }
         return 1;
     }
 

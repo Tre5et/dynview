@@ -1,5 +1,7 @@
 package net.treset.adaptiveview.config;
 
+import net.treset.adaptiveview.tools.TextTools;
+
 public class Rule {
     private RuleType type;
     private String value;
@@ -87,7 +89,7 @@ public class Rule {
                 }
             }
             case PLAYERS -> {
-                if(value != null && serverState.getPlayers().stream().map(String::toLowerCase).toList().contains(value.toLowerCase())) {
+                if(value != null && TextTools.containsIgnoreCase(serverState.getPlayers(), value)) {
                     return true;
                 } else if(valueInMinMax(serverState.getPlayers().size())) {
                     return true;

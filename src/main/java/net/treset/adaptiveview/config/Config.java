@@ -20,15 +20,19 @@ public class Config {
     private int maxViewDistance;
     private int minViewDistance;
     private boolean allowOnClient;
+    private boolean broadcastToOps;
+    private ArrayList<String> broadcastTo;
     private ArrayList<Rule> rules;
 
     private transient boolean locked = false;
 
-    public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, ArrayList<Rule> rules) {
+    public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, boolean broadcastToOps, ArrayList<String> broadcastTo, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
         this.allowOnClient = allowOnClient;
+        this.broadcastToOps = broadcastToOps;
+        this.broadcastTo = broadcastTo;
         this.rules = rules;
     }
 
@@ -38,6 +42,8 @@ public class Config {
             20,
             4,
             false,
+            false,
+            new ArrayList<>(),
             new ArrayList<>(List.of(
                     new Rule(
                             RuleType.MSPT,
@@ -146,6 +152,8 @@ public class Config {
             oldConfig.getMaxViewDistance(),
             oldConfig.getMinViewDistance(),
             oldConfig.isOverrideClient(),
+            false,
+            new ArrayList<>(),
             new ArrayList<>(List.of(
                     new Rule(
                             RuleType.MSPT,
@@ -207,6 +215,8 @@ public class Config {
         this.maxViewDistance = config.maxViewDistance;
         this.minViewDistance = config.minViewDistance;
         this.allowOnClient = config.allowOnClient;
+        this.broadcastToOps = config.broadcastToOps;
+        this.broadcastTo = config.broadcastTo;
         this.rules = config.rules;
     }
 
@@ -259,6 +269,22 @@ public class Config {
 
     public void setAllowOnClient(boolean allowOnClient) {
         this.allowOnClient = allowOnClient;
+    }
+
+    public boolean isBroadcastToOps() {
+        return broadcastToOps;
+    }
+
+    public void setBroadcastToOps(boolean broadcastToOps) {
+        this.broadcastToOps = broadcastToOps;
+    }
+
+    public ArrayList<String> getBroadcastTo() {
+        return broadcastTo;
+    }
+
+    public void setBroadcastTo(ArrayList<String> broadcastTo) {
+        this.broadcastTo = broadcastTo;
     }
 
     public ArrayList<Rule> getRules() {
