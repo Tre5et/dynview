@@ -14,8 +14,9 @@ You also need to install [Fabric API](https://www.curseforge.com/minecraft/mc-mo
 
 ## List of Features
 
- - Dynamic adjustment of the view distance based of MSPT performance
- - Customizable values for update rate, target mspt range, allowed view distance range and "aggressive" mspt adjustment range (through config file or ingame command)
+ - Dynamic adjustment of the view distance based of MSPT, Player count and Memory
+ - Highly customizable configuration [learn more...](config.md)
+ - Ingame commands to change everything [learn more...](commands.md)
  - An advanced view distance locking system
    - Manual locking of the view distance through ingame command
    - Conditional unlocking of the view distance based on time, a player disconnecting or a player moving
