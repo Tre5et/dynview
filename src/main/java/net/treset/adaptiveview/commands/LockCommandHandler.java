@@ -23,7 +23,7 @@ public class LockCommandHandler {
         this.lockManager = lockManager;
     }
 
-    public int base(CommandContext<ServerCommandSource> ctx) {
+    public int status(CommandContext<ServerCommandSource> ctx) {
         ViewDistanceLocker currentLocker = lockManager.getCurrentLocker();
         int numLockers = lockManager.getNumUnlockers();
         int lockedManually = lockManager.isLockedManually();
