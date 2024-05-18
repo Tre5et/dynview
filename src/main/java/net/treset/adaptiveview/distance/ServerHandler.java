@@ -42,7 +42,7 @@ public class ServerHandler {
 
         if(tickCounter == nextUpdate) {
             ServerState state = new ServerState(
-                    viewDistanceHandler.getViewDistance(),
+                    ViewDistanceHandler.getViewDistance(),
                     (double)MathTools.longArrayAverage(tickLengths.toArray(new Long[0])) / 1000000d,
                     getMemory(),
                     getPlayers()
@@ -57,7 +57,7 @@ public class ServerHandler {
     public static double getMemory() {
         long allocatedMemory = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
         long maxMemory = Runtime.getRuntime().maxMemory();
-        return allocatedMemory/(double)maxMemory;
+        return allocatedMemory/(double)maxMemory*100;
     }
 
     public static List<String> getPlayers() {

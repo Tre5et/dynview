@@ -66,7 +66,7 @@ A basic config applicable to most servers struggling for MSPT performance.
 
 
 
-```json
+```
 {
   "update_rate": 600, // 1.
   "max_view_distance": 20, // 2.
