@@ -428,7 +428,7 @@ public class ConfigCommandHandler {
         );
         config.getRules().add(r);
         config.save();
-        TextTools.replyFormatted(ctx, "Added new Rule at index $b%d$b. Modify the action to make it effective.", config.getRules().size() -1);
+        TextTools.replyFormatted(ctx, "Added new Rule at index $b%d$b. Modify the action to make it effective.", config.getRules().size());
         return 1;
     }
 
@@ -481,7 +481,7 @@ public class ConfigCommandHandler {
     }
 
     public int addPlayersName(CommandContext<ServerCommandSource> ctx) {
-        String name = ctx.getArgument("name", String.class);
+        String name = ctx.getArgument("names", String.class);
         return addRule(ctx, RuleType.PLAYERS, name, null, null);
     }
 }

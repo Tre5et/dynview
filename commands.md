@@ -129,6 +129,6 @@ adaptiveview
 |   |   |   |   |   range +
 |   |   |   |   |   |   [min: int] +
 |   |   |   |   |   |   |   [max: int]
-|   |   |   |   |   name +
-|   |   |   |   |   |   [name: string]
+|   |   |   |   |   names +
+|   |   |   |   |   |   [names: string]
 ```

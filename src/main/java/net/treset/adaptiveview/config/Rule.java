@@ -2,6 +2,9 @@ package net.treset.adaptiveview.config;
 
 import net.treset.adaptiveview.tools.TextTools;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Rule {
     private RuleType type;
     private String value;
@@ -89,14 +92,51 @@ public class Rule {
                 }
             }
             case PLAYERS -> {
-                if(value != null && TextTools.containsIgnoreCase(serverState.getPlayers(), value)) {
-                    return true;
+                if(value != null) {
+                    List<String> players = splitPlayers(value);
+
+                    if(value.startsWith("&")) {
+                        if(players.stream().allMatch((p) -> containsPlayer(serverState, p))) {
+                            // All specified players are online
+                            return true;
+                        }
+                    } else if(value.startsWith("!")) {
+                        if(serverState.getPlayers().stream().anyMatch((p) -> !TextTools.containsIgnoreCase(players, p))) {
+                            // Any not specified player is online
+                            return true;
+                        }
+                    } else if(value.startsWith("\\")) {
+                        if(players.stream().noneMatch((p) -> containsPlayer(serverState, p))) {
+                            // None of the specified players are online
+                            return true;
+                        }
+                    } else {
+                        if(players.stream().anyMatch((p) -> containsPlayer(serverState, p))) {
+                            // Any of the specified players are online
+                            return true;
+                        }
+                    }
                 } else if(valueInMinMax(serverState.getPlayers().size())) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private List<String> splitPlayers(String value) {
+        String players = value;
+        if(players.startsWith("&") || players.startsWith("!") || players.startsWith("\\")) {
+            players = players.substring(1);
+        }
+
+        String[] playerArray = players.split(",");
+        List<String> playerList = Arrays.stream(playerArray).map(String::trim).toList();
+        return playerList;
+    }
+
+    private boolean containsPlayer(ServerState serverState, String player) {
+        return TextTools.containsIgnoreCase(serverState.getPlayers(), player);
     }
 
     private boolean valueInMinMax(double value) {

@@ -15,7 +15,7 @@ These values apply if there are no rules active that override them.
 ### Other Configurations
 - `allow_on_client`: If this is enabled the mod will try to work in a client only environment. This can lead to unexpected behaviour.
 - `broadcast_to_ops`: If enabled, all operators get notified whenever the mod changes view distance.
-- `broadcast_to`: List of (case insensitive) player names that get notification whenever the mod changes the view distance.
+- `broadcast_to`: List of (case-insensitive) player names that get notification whenever the mod changes the view distance.
 
 ## Rules
 
@@ -28,7 +28,11 @@ All of the following need to be met for the rule to be active:
 
 - `min`: The minimum MSPT, Memory usage (in percent) or online Players required for the rule to be active.
 - `max`: The maximum MSPT, Memory usage (in percent) or online players allowed for the rule to be active.
-- `value`: The (case insensitive) name of a player that is needed to be online for the rule to be active. Only has an effect if `type` is `PLAYERS`.
+- `value`: A list of (case-insensitive) player names separated by `,`. The string can be prefixed with the following values change when the rule is active:
+  - No prefix: Any of the specified players are online
+  - `&`: All of the specified players are online
+  - `!`: Any not specified player is online
+  - `\`: None of the specified players are online
 
 ### Action
 
@@ -138,12 +142,12 @@ A config that could be used, if a server is low on memory.
 }
 ```
 
-### Config that locks the view distance if a specific player is online
+### Config that locks the view distance if specific players are online
 
-This config may e.g. be useful if you have a specific Alt-Account that is always used for running farms. This also works if the player is a carpet bot.
+This config may e.g. be useful if you have specific Alt-Accounts that are always used for running farms. This also works if the player is a carpet bot.
 
 1. Everything works just like the default config.
-2. If the player `FarmPlayer` is online, the view distance is locked to 6 chunks and the update rate is decreased to 5 Minutes, as nothing is changing.
+2. If the player `FarmPlayer1` or `FarmPlayer2` is online, the view distance is locked to 6 chunks and the update rate is decreased to 5 Minutes, as nothing is changing.
 
 ```json
 {
@@ -154,7 +158,7 @@ This config may e.g. be useful if you have a specific Alt-Account that is always
   "rules": [  
     {
       "type": "PLAYERS",
-      "value": "farmplayer",
+      "value": "farmplayer1,farmplayer2",
       "max_view_distance": 6,  // 2.
       "min_view_distance": 6,  // 2.
       "update_rate": 6000  // 2.
