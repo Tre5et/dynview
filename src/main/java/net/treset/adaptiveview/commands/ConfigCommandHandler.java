@@ -99,7 +99,7 @@ public class ConfigCommandHandler {
     }
 
     public int updateRate(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "Update Rate: ?B%s ticks", config.getUpdateRate());
+        TextTools.replyFormatted(ctx, "Update Rate: $b%s ticks", config.getUpdateRate());
         return 1;
     }
 
@@ -107,12 +107,12 @@ public class ConfigCommandHandler {
         Integer ticks = ctx.getArgument("ticks", Integer.class);
         config.setUpdateRate(ticks);
         config.save();
-        TextTools.replyFormatted(ctx, "Set Update Rate to ?B%s ticks", config.getUpdateRate());
+        TextTools.replyFormatted(ctx, "Set Update Rate to $b%s ticks", config.getUpdateRate());
         return 1;
     }
 
     public int maxView(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "Max View Distance: ?B%d chunks", config.getMaxViewDistance());
+        TextTools.replyFormatted(ctx, "Max View Distance: $b%d chunks", config.getMaxViewDistance());
         return 1;
     }
 
@@ -120,12 +120,12 @@ public class ConfigCommandHandler {
         Integer chunks = ctx.getArgument("chunks", Integer.class);
         config.setMaxViewDistance(chunks);
         config.save();
-        TextTools.replyFormatted(ctx, "Set Max View Distance to ?B%d chunks", config.getMaxViewDistance());
+        TextTools.replyFormatted(ctx, "Set Max View Distance to $b%d chunks", config.getMaxViewDistance());
         return 1;
     }
 
     public int minView(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "Min View Distance: ?B%s chunks", config.getMinViewDistance());
+        TextTools.replyFormatted(ctx, "Min View Distance: $b%s chunks", config.getMinViewDistance());
         return 1;
     }
 
@@ -133,7 +133,7 @@ public class ConfigCommandHandler {
         Integer chunks = ctx.getArgument("chunks", Integer.class);
         config.setMinViewDistance(chunks);
         config.save();
-        TextTools.replyFormatted(ctx, "Set Min View Distance to ?B%s chunks", config.getMinViewDistance());
+        TextTools.replyFormatted(ctx, "Set Min View Distance to $b%s chunks", config.getMinViewDistance());
         return 1;
     }
 
