@@ -76,6 +76,7 @@ adaptiveview
 |   |   |   |   remove
 |   |   |   |   name
 |   |   |   |   |   [name: string]
+|   |   |   |   |   clear
 |   |   |   |   condition
 |   |   |   |   |   type
 |   |   |   |   |   |   mspt
