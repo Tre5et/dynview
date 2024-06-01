@@ -207,6 +207,14 @@ public class ConfigCommandHandler {
         });
     }
 
+    public int ruleClearName(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            r.setName(null);
+            config.save();
+            TextTools.replyFormatted(ctx, "Cleared Name of rule $b%d$b", i);
+        });
+    }
+
     public int ruleCondition(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             TextTools.replyFormatted(ctx, "Condition of rule $b%d$b: %s", i, r.toConditionString());
