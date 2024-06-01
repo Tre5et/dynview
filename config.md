@@ -26,11 +26,11 @@ Rules also support custom names using the `name` property.
 ### Condition
 - `type`: One of `MSPT`, `MEMORY` or `PLAYERS`. The kind of condition this is.
 
-All of the following need to be met for the rule to be active:
+All the following need to be met for the rule to be active:
 
 - `min`: The minimum MSPT, Memory usage (in percent) or online Players required for the rule to be active.
 - `max`: The maximum MSPT, Memory usage (in percent) or online players allowed for the rule to be active.
-- `value`: A list of (case-insensitive) player names separated by `,`. The string can be prefixed with the following values change when the rule is active:
+- `value`: A list of (case-insensitive) player names (only active if `type` is `PLAYERS`) separated by `,`. The string can be prefixed with the following values to specify when the rule is active:
   - No prefix: Any of the specified players are online
   - `&`: All of the specified players are online
   - `!`: Any not specified player is online
@@ -56,6 +56,8 @@ If the same value is set by multiple active rules, the following way of resolvin
 - `step`: If there are negative step values, the lowest one is used, else the highest one is used.
 - `step_after`: Individual per rule. Effects the rule's `step`.
 
+In general, the value that is more limiting is used.
+
 ## Examples
 
 ### The default config
@@ -72,7 +74,7 @@ A basic config applicable to most servers struggling for MSPT performance.
 
 
 
-```
+```json
 {
   "update_rate": 600, // 1.
   "max_view_distance": 20, // 2.
@@ -195,6 +197,7 @@ Option names followed by a `?` denote optional options.
 
 ```json
 {
+  "name": string,
   "update_rate": int[1..],
   "max_view_distance": int[2..32],
   "min_view_distance": int[2..32],
