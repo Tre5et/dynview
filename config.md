@@ -21,6 +21,8 @@ These values apply if there are no rules active that override them.
 
 Rules specify by which conditions view distance is adjusted. They are made up of a condition and an action that is applied when the condition is met.
 
+Rules also support custom names using the `name` property.
+
 ### Condition
 - `type`: One of `MSPT`, `MEMORY` or `PLAYERS`. The kind of condition this is.
 

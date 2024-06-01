@@ -15,10 +15,11 @@ public class Rule {
     private Integer stepAfter;
     private Integer maxViewDistance;
     private Integer minViewDistance;
+    private String name;
     private transient boolean valid = true;
     private transient int counter = 0;
 
-    public Rule(RuleType type, String value, Integer max, Integer min, Integer updateRate, Integer step, Integer stepAfter, Integer maxViewDistance, Integer minViewDistance) {
+    public Rule(RuleType type, String value, Integer max, Integer min, Integer updateRate, Integer step, Integer stepAfter, Integer maxViewDistance, Integer minViewDistance, String name) {
         this.type = type;
         this.value = value;
         this.max = max;
@@ -28,6 +29,7 @@ public class Rule {
         this.stepAfter = stepAfter;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
+        this.name = name;
     }
 
     public boolean isEffective() {
@@ -201,7 +203,8 @@ public class Rule {
 
     @Override
     public String toString() {
-        String str = "Condition: " + toConditionString() + "; Action: " + toActionString();
+        String str = name == null ? "" : "$b" + name + "$b: ";
+        str += "Condition: " + toConditionString() + "; Action: " + toActionString();
         if(!valid) {
             str += " $R($bIneffective!$b)$W";
         }
@@ -292,5 +295,13 @@ public class Rule {
     public void setMinViewDistance(Integer minViewDistance) {
         this.minViewDistance = minViewDistance;
         isEffective();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

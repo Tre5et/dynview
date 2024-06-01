@@ -74,6 +74,8 @@ adaptiveview
 |   |   rules
 |   |   |   [index: int]
 |   |   |   |   remove
+|   |   |   |   name
+|   |   |   |   |   [name: string]
 |   |   |   |   condition
 |   |   |   |   |   type
 |   |   |   |   |   |   mspt

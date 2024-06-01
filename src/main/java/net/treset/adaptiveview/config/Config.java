@@ -54,6 +54,7 @@ public class Config {
                             -2,
                             null,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -65,6 +66,7 @@ public class Config {
                             -1,
                             null,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -74,6 +76,7 @@ public class Config {
                             null,
                             null,
                             1,
+                            null,
                             null,
                             null,
                             null
@@ -88,8 +91,8 @@ public class Config {
                             2,
                             null,
                             null,
+                            null,
                             null
-
                     )
             ))
         );
@@ -164,6 +167,7 @@ public class Config {
                             -2,
                             null,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -175,6 +179,7 @@ public class Config {
                             -1,
                             null,
                             null,
+                            null,
                             null
                     ),
                     new Rule(
@@ -184,6 +189,7 @@ public class Config {
                             null,
                             null,
                             1,
+                            null,
                             null,
                             null,
                             null
@@ -198,8 +204,8 @@ public class Config {
                             2,
                             null,
                             null,
+                            null,
                             null
-
                     )
             ))
         );

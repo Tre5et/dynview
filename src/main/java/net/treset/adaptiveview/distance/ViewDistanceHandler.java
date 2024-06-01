@@ -84,14 +84,30 @@ public class ViewDistanceHandler {
             return "no Rules";
         }
         if(activeIndexes.size() == 1) {
-            return "Rule " + activeIndexes.get(0);
+            String ruleName = config.getRules().get(activeIndexes.get(0) - 1).getName();
+            if(ruleName == null) {
+                ruleName = activeIndexes.get(0).toString();
+            }
+            return "Rule " + ruleName;
         }
         StringBuilder sb = new StringBuilder("Rules ");
-        sb.append(activeIndexes.get(0));
-        for(int i = 1; i < activeIndexes.size() - 1; i++) {
-            sb.append(", ").append(activeIndexes.get(i));
+        String ruleName1 = config.getRules().get(activeIndexes.get(0) - 1).getName();
+        if(ruleName1 == null) {
+            ruleName1 = activeIndexes.get(0).toString();
         }
-        sb.append(" and ").append(activeIndexes.get(activeIndexes.size() - 1));
+        sb.append(ruleName1);
+        for(int i = 1; i < activeIndexes.size() - 1; i++) {
+            String ruleName = config.getRules().get(activeIndexes.get(i) - 1).getName();
+            if(ruleName == null) {
+                ruleName = activeIndexes.get(i).toString();
+            }
+            sb.append(", ").append(ruleName);
+        }
+        String ruleNameN = config.getRules().get(activeIndexes.get(activeIndexes.size() - 1) - 1).getName();
+        if(ruleNameN == null) {
+            ruleNameN = activeIndexes.get(activeIndexes.size() - 1).toString();
+        }
+        sb.append(" and ").append(ruleNameN);
         return sb.toString();
     }
 

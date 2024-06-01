@@ -192,6 +192,21 @@ public class ConfigCommandHandler {
         });
     }
 
+    public int ruleName(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            TextTools.replyFormatted(ctx, "Name of rule $b%d$b: $b%s$b", i, r.getName());
+        });
+    }
+
+    public int ruleSetName(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            String name = ctx.getArgument("name", String.class);
+            r.setName(name);
+            config.save();
+            TextTools.replyFormatted(ctx, "Set Name of rule $b%d$b to $b%s$b", i, r.getName());
+        });
+    }
+
     public int ruleCondition(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             TextTools.replyFormatted(ctx, "Condition of rule $b%d$b: %s", i, r.toConditionString());
@@ -420,6 +435,7 @@ public class ConfigCommandHandler {
                 value,
                 max,
                 min,
+                null,
                 null,
                 null,
                 null,
