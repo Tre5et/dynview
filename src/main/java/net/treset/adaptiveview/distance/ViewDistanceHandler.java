@@ -67,7 +67,7 @@ public class ViewDistanceHandler {
 
         int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + step, minViewDistance, maxViewDistance);
 
-        if(targetViewDistance != state.getCurrentViewDistance()) {
+        if(targetViewDistance != state.getCurrentViewDistance() && !config.isLocked()) {
             TextTools.sendMessage((p) -> {
                 if(config.isBroadcastToOps() && AdaptiveViewMod.getServer().getPlayerManager().isOperator(p.getGameProfile())) {
                     return true;
