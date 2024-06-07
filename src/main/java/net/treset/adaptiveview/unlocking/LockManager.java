@@ -9,17 +9,17 @@ import java.util.List;
 public class LockManager {
     private final Config config;
     private final ViewDistanceHandler viewDistanceHandler;
-    private final List<ViewDistanceLocker> unlockers = new ArrayList<>();
+    private final List<Locker> lockers = new ArrayList<>();
     private int lockedManually = 0;
 
-    private ViewDistanceLocker currentLocker = null;
+    private Locker currentLocker = null;
 
     public LockManager(Config config, ViewDistanceHandler viewDistanceHandler) {
         this.config = config;
         this.viewDistanceHandler = viewDistanceHandler;
     }
 
-    public ViewDistanceLocker getCurrentLocker() {
+    public Locker getCurrentLocker() {
         return currentLocker;
     }
 
@@ -29,34 +29,34 @@ public class LockManager {
         lock(chunks);
     }
 
-    public int getNumUnlockers() { return unlockers.size(); }
+    public int getNumLockers() { return lockers.size(); }
 
-    public void addUnlocker(ViewDistanceLocker unlocker) {
-        unlockers.add(unlocker);
-        updateUnlocker();
+    public void addLocker(Locker unlocker) {
+        lockers.add(unlocker);
+        updateLocker();
     }
 
-    public void clearUnlockers() {
-        unlockers.clear();
+    public void clearLockers() {
+        lockers.clear();
     }
 
 
-    private final List<ViewDistanceLocker> toRemove = new ArrayList<>();
-    public void finishUnlocker(ViewDistanceLocker unlocker) {
+    private final List<Locker> toRemove = new ArrayList<>();
+    public void finishLocker(Locker unlocker) {
         toRemove.add(unlocker);
     }
 
-    public void updateUnlocker() {
+    public void updateLocker() {
         if(isLockedManually() != 0) return;
 
-        if(unlockers.isEmpty()) {
+        if(lockers.isEmpty()) {
             clear();
             return;
         }
 
-        int smallestViewDistance = unlockers.get(0).getDistance();
-        ViewDistanceLocker newLocker = unlockers.get(0);
-        for(ViewDistanceLocker e : unlockers) {
+        int smallestViewDistance = lockers.get(0).getDistance();
+        Locker newLocker = lockers.get(0);
+        for(Locker e : lockers) {
             if(e.getDistance() < smallestViewDistance) {
                 smallestViewDistance = e.getDistance();
                 newLocker = e;
@@ -73,7 +73,7 @@ public class LockManager {
     }
 
     public void clear() {
-        clearUnlockers();
+        clearLockers();
 
         if(lockedManually > 0) {
             lock(lockedManually);
@@ -83,7 +83,7 @@ public class LockManager {
 
     public void unlockManually() {
         lockedManually = 0;
-        updateUnlocker();
+        updateLocker();
     }
 
     public void unlock() {
@@ -93,12 +93,12 @@ public class LockManager {
     }
 
     public void onTick() {
-        for(ViewDistanceLocker e : unlockers) {
+        for(Locker e : lockers) {
             e.onTick();
         }
 
-        unlockers.removeAll(toRemove);
+        lockers.removeAll(toRemove);
 
-        updateUnlocker();
+        updateLocker();
     }
 }

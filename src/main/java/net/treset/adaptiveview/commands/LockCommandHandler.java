@@ -10,9 +10,7 @@ import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
 import net.treset.adaptiveview.tools.TextTools;
-import net.treset.adaptiveview.unlocking.LockManager;
-import net.treset.adaptiveview.unlocking.LockReason;
-import net.treset.adaptiveview.unlocking.ViewDistanceLocker;
+import net.treset.adaptiveview.unlocking.*;
 
 public class LockCommandHandler {
     private final Config config;
@@ -24,8 +22,8 @@ public class LockCommandHandler {
     }
 
     public int status(CommandContext<ServerCommandSource> ctx) {
-        ViewDistanceLocker currentLocker = lockManager.getCurrentLocker();
-        int numLockers = lockManager.getNumUnlockers();
+        Locker currentLocker = lockManager.getCurrentLocker();
+        int numLockers = lockManager.getNumLockers();
         int lockedManually = lockManager.isLockedManually();
 
         if(!config.isLocked()) {
@@ -42,8 +40,8 @@ public class LockCommandHandler {
 
         if(currentLocker != null) {
             if(numLockers > 1) {
-                TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b %s and $b%s other %s$b active", currentLocker.getDistance(), currentLocker.getReasonString(), numLockers - 1, (numLockers > 2)? "lockers are" : "locker is"), false);
-            } else  TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b %s", currentLocker.getDistance(), currentLocker.getReasonString()), false);
+                TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b until %s and $b%s other %s$b active", currentLocker.getDistance(), currentLocker.getLockedReason(), numLockers - 1, (numLockers > 2)? "lockers are" : "locker is"), false);
+            } else  TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b until %s", currentLocker.getDistance(), currentLocker.getLockedReason()), false);
             return 1;
         }
 
@@ -74,7 +72,7 @@ public class LockCommandHandler {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
         int ticks = IntegerArgumentType.getInteger(ctx, "ticks");
 
-        lockManager.addUnlocker(new ViewDistanceLocker(LockReason.TIMEOUT, chunks, ticks, lockManager, null, ctx));
+        lockManager.addLocker(new TimeoutLocker(ticks, chunks, lockManager));
 
         TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b for $b%s ticks", chunks, ticks), true);
         return 1;
@@ -96,7 +94,7 @@ public class LockCommandHandler {
             return 0;
         }
 
-        lockManager.addUnlocker(new ViewDistanceLocker(LockReason.PLAYER_DISCONNECT, chunks, -1, lockManager, player, ctx));
+        lockManager.addLocker(new PlayerDisconnectLocker(player, chunks, lockManager));
 
         TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b until $b%s disconnects", chunks, player.getName().getString()), true);
         return 1;
@@ -113,14 +111,14 @@ public class LockCommandHandler {
             return 0;
         }
 
-        lockManager.addUnlocker(new ViewDistanceLocker(LockReason.PLAYER_MOVE, chunks, -1, lockManager, player, ctx));
+        lockManager.addLocker(new PlayerMoveLocker(player, chunks, lockManager));
 
         TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b until $b%s moves", chunks, player.getName().getString()), true);
         return 1;
     }
 
     public int unlock(CommandContext<ServerCommandSource> ctx) {
-        int numLocks = lockManager.getNumUnlockers();
+        int numLocks = lockManager.getNumLockers();
         int lockedManually = lockManager.isLockedManually();
 
         if(lockedManually == 0) {
@@ -140,7 +138,7 @@ public class LockCommandHandler {
     }
 
     public int clear(CommandContext<ServerCommandSource> ctx) {
-        int numLocks = lockManager.getNumUnlockers();
+        int numLocks = lockManager.getNumLockers();
         int lockedManually = lockManager.isLockedManually();
 
         if(numLocks == 0 && lockedManually == 0) {
