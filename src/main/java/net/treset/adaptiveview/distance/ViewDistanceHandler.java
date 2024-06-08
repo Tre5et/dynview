@@ -110,9 +110,7 @@ public class ViewDistanceHandler {
     }
 
     public void setViewDistance(int chunks) {
-        if(!config.isLocked()) {
-            AdaptiveViewMod.getServer().getPlayerManager().setViewDistance(chunks);
-        }
+        AdaptiveViewMod.getServer().getPlayerManager().setViewDistance(chunks);
     }
 
     public static int getViewDistance() {

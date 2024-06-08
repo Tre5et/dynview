@@ -71,7 +71,9 @@ public class LockManager {
     }
 
     public void lock(int chunks) {
-        viewDistanceHandler.setViewDistance(chunks);
+        if(ViewDistanceHandler.getViewDistance() != chunks) {
+            viewDistanceHandler.setViewDistance(chunks);
+        }
         config.setLocked(true);
     }
 
