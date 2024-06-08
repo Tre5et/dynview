@@ -1,10 +1,12 @@
 package net.treset.adaptiveview.distance;
 
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
 import net.treset.adaptiveview.config.ServerState;
 import net.treset.adaptiveview.tools.MathTools;
+import net.treset.adaptiveview.tools.NotificationState;
 import net.treset.adaptiveview.tools.TextTools;
 
 import java.util.ArrayList;
@@ -68,11 +70,7 @@ public class ViewDistanceHandler {
         int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + step, minViewDistance, maxViewDistance);
 
         if(targetViewDistance != state.getCurrentViewDistance() && !config.isLocked()) {
-            TextTools.sendMessage((p) -> {
-                if(config.isBroadcastToOps() && AdaptiveViewMod.getServer().getPlayerManager().isOperator(p.getGameProfile())) {
-                    return true;
-                } else return TextTools.containsIgnoreCase(config.getBroadcastTo(), p.getName().getString());
-            }, "$N$i[AdaptiveView] Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(activeIndexes));
+            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(activeIndexes));
             setViewDistance(targetViewDistance);
         }
 
@@ -119,5 +117,19 @@ public class ViewDistanceHandler {
 
     public static int getViewDistance() {
         return AdaptiveViewMod.getServer().getPlayerManager().getViewDistance();
+    }
+
+    public static boolean shouldBroadcastChange(ServerPlayerEntity player, Config config) {NotificationState state = NotificationState.getFromPlayer(player, config.getBroadcastChanges());
+        if(state == NotificationState.ADDED) {
+            return true;
+        }
+        if(state == NotificationState.REMOVED) {
+            return false;
+        }
+        return switch(config.getBroadcastChangesDefault()) {
+            case ALL -> true;
+            case NONE -> false;
+            case OPS -> AdaptiveViewMod.getServer().getPlayerManager().isOperator(player.getGameProfile());
+        };
     }
 }

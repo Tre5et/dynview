@@ -14,8 +14,10 @@ These values apply if there are no rules active that override them.
 
 ### Other Configurations
 - `allow_on_client`: If this is enabled the mod will try to work in a client only environment. This can lead to unexpected behaviour.
-- `broadcast_to_ops`: If enabled, all operators get notified whenever the mod changes view distance.
-- `broadcast_to`: List of (case-insensitive) player names that get notification whenever the mod changes the view distance.
+- `broadcast_changes_default`: Sets which player group (`NONE`, `OPS`, `ALL`) gets notified when the view distance changes by default.
+- `broadcast_changes`: List of (case-insensitive) player names, that get notified when the view distance changes. If the name is prefixed with `!`, the player will not get notified..
+- `broadcast_lock_default`: Sets which player group (`NONE`, `OPS`, `ALL`) gets notified when the view distance is locked or unlocked by default.
+- `broadcast_lock`: List of (case-insensitive) player names, that get notified when the view distance is locked or unlocked. If the name is prefixed with `!`, the player will not get notified. 
 
 ## Rules
 
@@ -202,8 +204,12 @@ Option names followed by a `?` denote optional options.
   "max_view_distance": int[2..32],
   "min_view_distance": int[2..32],
   "allow_on_clinet": boolean,
-  "broadcast_to_ops": boolean,
-  "broadcast_to": [
+  "broadcast_changes_default": string[NONE/OPS/ALL],
+  "broadcast_changes": [
+    string
+  ],
+  "broadcast_lock_default": string[NONE/OPS/ALL],
+  "broadcast_lock": [
     string
   ],
   "rules": [

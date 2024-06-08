@@ -16,7 +16,7 @@ public class PlayerMoveLocker extends Locker {
 
     @Override
     public boolean shouldUnlock() {
-        return this.player.isDisconnected() || this.player.getPos().equals(this.startPos);
+        return this.player.isDisconnected() || !this.player.getPos().equals(this.startPos);
     }
 
     @Override

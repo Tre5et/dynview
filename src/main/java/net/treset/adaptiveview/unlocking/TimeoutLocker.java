@@ -4,17 +4,22 @@ import net.treset.adaptiveview.tools.Message;
 
 public class TimeoutLocker extends Locker {
     private final int timeout;
-    private final long startTime;
+    private int remaining;
 
     public TimeoutLocker(int distance, int timeout, LockManager lockManager) {
         super(distance, lockManager);
         this.timeout = timeout;
-        this.startTime = System.currentTimeMillis();
+        this.remaining = timeout;
+    }
+
+    @Override
+    public void beforeTick() {
+        this.remaining--;
     }
 
     @Override
     public boolean shouldUnlock() {
-        return System.currentTimeMillis() - startTime >= timeout;
+        return this.remaining <= 0;
     }
 
     @Override
@@ -24,6 +29,6 @@ public class TimeoutLocker extends Locker {
 
     @Override
     public Message getLockedReason() {
-        return new Message("$b%s ticks have passed", this.timeout);
+        return new Message("$b%s more ticks have passed", this.remaining);
     }
 }

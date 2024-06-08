@@ -104,15 +104,21 @@ public class TextTools {
         ctx.getSource().sendError(Text.literal(text));
     }
 
-    public static void sendMessage(Function<ServerPlayerEntity, Boolean> shouldSend, String message, Object... args) {
+    public static void broadcastIf(Function<ServerPlayerEntity, Boolean> condition, String message, Object... args) {
+        message = "$N$i[AdaptiveView] " + message;
         Text formated = formatText(String.format(message, args));
 
         List<ServerPlayerEntity> players = AdaptiveViewMod.getServer().getPlayerManager().getPlayerList();
         for(ServerPlayerEntity player : players) {
-            if(shouldSend.apply(player)) {
+            if(condition == null || condition.apply(player)) {
                 player.sendMessage(formated);
             }
         }
+    }
+
+    public static void replyAndBroadcastIf(Function<ServerPlayerEntity, Boolean> condition, CommandContext<ServerCommandSource> ctx, String message, Object... args) {
+        replyFormatted(ctx, message, args);
+        broadcastIf((player) -> player != ctx.getSource().getPlayer() && (condition == null || condition.apply(player)), message, args);
     }
 
     public static boolean containsIgnoreCase(List<String> list, String str) {

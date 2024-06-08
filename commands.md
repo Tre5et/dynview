@@ -4,7 +4,7 @@ All commands are accessible using `/adaptiveview`.
 
 ## Notifications
 
-`/adaptiveview notifications` allows you to check if you are receiving notifications and allows you to `subscribe` and `unsubscribe`.
+`/adaptiveview notifications` allows you to `subscribe` and `unsubscribe` to notifications when the view distance `changes` or a `lock` is set or removed.
 
 ## Lock
 
@@ -48,8 +48,12 @@ Commands followed by a `+` require one of the following options to work.
 adaptiveview
 |   status
 |   notifications
-|   |   subscribe
-|   |   unsubscribe
+|   |   changes
+|   |   |   subscribe
+|   |   |   unsubscribe
+|   |   lock
+|   |   |   subscribe
+|   |   |   unsubscribe
 |   lock
 |   |   status
 |   |   set +
@@ -65,6 +69,14 @@ adaptiveview
 |   config
 |   |   status
 |   |   reload
+|   |   broadcast_changes
+|   |   |   none
+|   |   |   ops
+|   |   |   all
+|   |   broadcast_lock
+|   |   |   none
+|   |   |   ops
+|   |   |   all
 |   |   update_rate
 |   |   |   [ticks: int]
 |   |   max_view_distance

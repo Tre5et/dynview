@@ -54,12 +54,16 @@ public class LockCommandHandler {
         return 1;
     }
 
+    private void replyAndBroadcastLock(CommandContext<ServerCommandSource> ctx, String message, Object... args) {
+        TextTools.replyAndBroadcastIf((p) -> LockManager.shouldBroadcastLock(p, config), ctx, message, args);
+    }
+
     public int setChunks(CommandContext<ServerCommandSource> ctx) {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
 
         lockManager.lockManually(chunks);
 
-        TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks", chunks), true);
+        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks", chunks);
         return 1;
     }
 
@@ -72,14 +76,14 @@ public class LockCommandHandler {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
         int ticks = IntegerArgumentType.getInteger(ctx, "ticks");
 
-        lockManager.addLocker(new TimeoutLocker(ticks, chunks, lockManager));
+        lockManager.addLocker(new TimeoutLocker(chunks, ticks, lockManager));
 
-        TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b for $b%s ticks", chunks, ticks), true);
+        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b for $b%s ticks", chunks, ticks);
         return 1;
     }
 
     public int setChunksPlayer(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "$iThe View Distance will be unlocked after the provided player disconnects or moves", false);
+        TextTools.replyFormatted(ctx, "$iThe View Distance will be unlocked after the provided player disconnects or moves");
         return 1;
     }
 
@@ -96,7 +100,7 @@ public class LockCommandHandler {
 
         lockManager.addLocker(new PlayerDisconnectLocker(player, chunks, lockManager));
 
-        TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b until $b%s disconnects", chunks, player.getName().getString()), true);
+        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b until $b%s disconnects", chunks, player.getName().getString());
         return 1;
     }
 
@@ -113,7 +117,7 @@ public class LockCommandHandler {
 
         lockManager.addLocker(new PlayerMoveLocker(player, chunks, lockManager));
 
-        TextTools.replyFormatted(ctx, String.format("Locked the View Distance to $b%s chunks$b until $b%s moves", chunks, player.getName().getString()), true);
+        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b until $b%s moves", chunks, player.getName().getString());
         return 1;
     }
 
@@ -129,11 +133,11 @@ public class LockCommandHandler {
         lockManager.unlockManually();
 
         if(lockedManually > 0 && numLocks > 0) {
-            TextTools.replyFormatted(ctx, String.format("$bUnlocked$b the View Distance but there %s still $b%s %s$b active", (numLocks > 1)? "are" : "is", numLocks, (numLocks > 1)? "lockers": "locker"), true);
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance but there %s still $b%s %s$b active", (numLocks > 1)? "are" : "is", numLocks, (numLocks > 1)? "lockers": "locker");
             return 1;
         }
 
-        TextTools.replyFormatted(ctx, "$bUnlocked$b the View Distance", true);
+        replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance");
         return 1;
     }
 
@@ -150,16 +154,16 @@ public class LockCommandHandler {
         lockManager.unlockManually();
 
         if(lockedManually > 0 && numLocks > 0) {
-            TextTools.replyFormatted(ctx, String.format("$bUnlocked$b the View Distance and $bcleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker"), true);
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance and $bcleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker");
             return 1;
         }
 
         if(lockedManually > 0) {
-            TextTools.replyFormatted(ctx, "$bUnlocked$b the View Distance", true);
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance", true);
             return 1;
         }
 
-        TextTools.replyFormatted(ctx, String.format("$bCleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker"), true);
+        replyAndBroadcastLock(ctx, "$bCleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker");
         return 1;
     }
 }

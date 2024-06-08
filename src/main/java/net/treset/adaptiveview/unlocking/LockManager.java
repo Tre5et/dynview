@@ -1,7 +1,10 @@
 package net.treset.adaptiveview.unlocking;
 
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
+import net.treset.adaptiveview.tools.NotificationState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,5 +103,24 @@ public class LockManager {
         lockers.removeAll(toRemove);
 
         updateLocker();
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public static boolean shouldBroadcastLock(ServerPlayerEntity player, Config config) {
+        NotificationState state = NotificationState.getFromPlayer(player, config.getBroadcastLock());
+        if(state == NotificationState.ADDED) {
+            return true;
+        }
+        if(state == NotificationState.REMOVED) {
+            return false;
+        }
+        return switch(config.getBroadcastLockDefault()) {
+            case ALL -> true;
+            case NONE -> false;
+            case OPS -> AdaptiveViewMod.getServer().getPlayerManager().isOperator(player.getGameProfile());
+        };
     }
 }

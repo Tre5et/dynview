@@ -1,7 +1,10 @@
 package net.treset.adaptiveview.config;
 
 import com.google.gson.*;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import net.treset.adaptiveview.AdaptiveViewMod;
+import net.treset.adaptiveview.tools.BroadcastLevel;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,20 +23,28 @@ public class Config {
     private int maxViewDistance;
     private int minViewDistance;
     private boolean allowOnClient;
-    private boolean broadcastToOps;
-    private ArrayList<String> broadcastTo;
+    @SerializedName("broadcast_to_ops")
+    @Expose(serialize = false)
+    private boolean deprecatedBroadcastToOps;
+    private BroadcastLevel broadcastChangesDefault;
+    @SerializedName(value = "broadcast_changes", alternate = "broadcast_to")
+    private ArrayList<String> broadcastChanges;
+    private BroadcastLevel broadcastLockDefault;
+    private ArrayList<String> broadcastLock;
     private ArrayList<Rule> rules;
 
     private transient boolean locked = false;
 
-    public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, boolean broadcastToOps, ArrayList<String> broadcastTo, ArrayList<Rule> rules) {
+    public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
         this.allowOnClient = allowOnClient;
-        this.broadcastToOps = broadcastToOps;
-        this.broadcastTo = broadcastTo;
         this.rules = rules;
+        this.broadcastChangesDefault = broadcastChangesDefault;
+        this.broadcastChanges = broadcastChanges;
+        this.broadcastLockDefault = broadcastLockDefault;
+        this.broadcastLock = broadcastLock;
     }
 
     public static Config generic() {
@@ -42,7 +53,9 @@ public class Config {
             20,
             4,
             false,
-            false,
+            BroadcastLevel.NONE,
+            new ArrayList<>(),
+            BroadcastLevel.OPS,
             new ArrayList<>(),
             new ArrayList<>(List.of(
                     new Rule(
@@ -130,11 +143,27 @@ public class Config {
                     AdaptiveViewMod.LOGGER.warn("Rule is not effective: {}", rule);
                 }
             }
+            amendMigration(config);
             AdaptiveViewMod.LOGGER.info("Loaded config");
             return config;
         } catch (JsonSyntaxException e) {
             AdaptiveViewMod.LOGGER.warn("Failed to parse config, using default", e);
             throw new IOException("Failed to load config", e);
+        }
+    }
+
+    private static void amendMigration(Config config) {
+        if(config.getBroadcastChangesDefault() == null) {
+            config.setBroadcastChangesDefault(config.deprecatedIsBroadcastToOps() ? BroadcastLevel.OPS : BroadcastLevel.NONE);
+        }
+        if(config.getBroadcastChanges() == null) {
+            config.setBroadcastChanges(new ArrayList<>());
+        }
+        if(config.getBroadcastLockDefault() == null) {
+            config.setBroadcastLockDefault(BroadcastLevel.OPS);
+        }
+        if(config.getBroadcastLock() == null) {
+            config.setBroadcastLock(new ArrayList<>());
         }
     }
 
@@ -155,7 +184,9 @@ public class Config {
             oldConfig.getMaxViewDistance(),
             oldConfig.getMinViewDistance(),
             oldConfig.isOverrideClient(),
-            false,
+            BroadcastLevel.NONE,
+            new ArrayList<>(),
+            BroadcastLevel.OPS,
             new ArrayList<>(),
             new ArrayList<>(List.of(
                     new Rule(
@@ -221,8 +252,10 @@ public class Config {
         this.maxViewDistance = config.maxViewDistance;
         this.minViewDistance = config.minViewDistance;
         this.allowOnClient = config.allowOnClient;
-        this.broadcastToOps = config.broadcastToOps;
-        this.broadcastTo = config.broadcastTo;
+        this.broadcastChangesDefault = config.broadcastChangesDefault;
+        this.broadcastChanges = config.broadcastChanges;
+        this.broadcastLockDefault = config.broadcastLockDefault;
+        this.broadcastLock = config.broadcastLock;
         this.rules = config.rules;
     }
 
@@ -277,20 +310,36 @@ public class Config {
         this.allowOnClient = allowOnClient;
     }
 
-    public boolean isBroadcastToOps() {
-        return broadcastToOps;
+    public BroadcastLevel getBroadcastChangesDefault() {
+        return broadcastChangesDefault;
     }
 
-    public void setBroadcastToOps(boolean broadcastToOps) {
-        this.broadcastToOps = broadcastToOps;
+    public void setBroadcastChangesDefault(BroadcastLevel broadcastChangesDefault) {
+        this.broadcastChangesDefault = broadcastChangesDefault;
     }
 
-    public ArrayList<String> getBroadcastTo() {
-        return broadcastTo;
+    public ArrayList<String> getBroadcastChanges() {
+        return broadcastChanges;
     }
 
-    public void setBroadcastTo(ArrayList<String> broadcastTo) {
-        this.broadcastTo = broadcastTo;
+    public void setBroadcastChanges(ArrayList<String> broadcastChanges) {
+        this.broadcastChanges = broadcastChanges;
+    }
+
+    public BroadcastLevel getBroadcastLockDefault() {
+        return broadcastLockDefault;
+    }
+
+    public void setBroadcastLockDefault(BroadcastLevel broadcastLockDefault) {
+        this.broadcastLockDefault = broadcastLockDefault;
+    }
+
+    public ArrayList<String> getBroadcastLock() {
+        return broadcastLock;
+    }
+
+    public void setBroadcastLock(ArrayList<String> broadcastLock) {
+        this.broadcastLock = broadcastLock;
     }
 
     public ArrayList<Rule> getRules() {
@@ -307,5 +356,10 @@ public class Config {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    @Deprecated
+    public boolean deprecatedIsBroadcastToOps() {
+        return deprecatedBroadcastToOps;
     }
 }
