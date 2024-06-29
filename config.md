@@ -11,6 +11,8 @@ These values apply if there are no rules active that override them.
 - `update_rate`: The interval in ticks after which performance is checked and view distance is adjusted.
 - `max_view_distance`: The maximum view distance the dynamic adjustment can go up to.
 - `min_view_distance`: The minimum view distance the dynamic adjustment can go down to.
+- `max_sim_distance`: The maximum simulation distance the dynamic adjustment can go up to.
+- `min_sim_distance`: The minimum simulation distance the dynamic adjustment can go down to.
 
 ### Other Configurations
 - `allow_on_client`: If this is enabled the mod will try to work in a client only environment. This can lead to unexpected behaviour.
@@ -39,13 +41,14 @@ All the following need to be met for the rule to be active:
   - `\`: None of the specified players are online
 
 ### Action
+- `target`: One of `VIEW` or `SIMULATION`. Whether view- or simulation-distance is affected.
 
 If the condition is met, the following actions are performed:
 
 - `update_rate`: Overrides the global `update_rate` value.
-- `max_view_distance`: Overrides the global `max_view_distance` value.
-- `min_view_distance`: Overrides the global `min_view_distance` value.
-- `step`: The amount of chunks the view distance is changed by every update. Positive values increase the view distance and negative values decrease it. 
+- `max_distance`: Overrides the global `max_view_distance` or `max_sim_distance` value depending on `target`.
+- `min_distance`: Overrides the global `min_distance` or `max_sim_distance` value depending on `target`.
+- `step`: The amount of chunks the view- or simulation-distance is changed by every update. Positive values increase the  distance and negative values decrease it. 
 - `step_after`: The amount of update after which the step is performed. E.g. if `update_rate` is `100` and `step_after` is `2`, the `step` will be performed every `200` ticks.
 
 ### Resolving conflicts
@@ -53,8 +56,8 @@ If the condition is met, the following actions are performed:
 If the same value is set by multiple active rules, the following way of resolving conflicts is used:
 
 - `update_rate`: The lowest value is used.
-- `min_view_distance`: The highest value is used.
-- `max_view_distance`: The lowest value is used. If `min_view_distance` is greater than `max_view_distance`, the value of `min_view_distance` is used.
+- `min_distance`: The highest value is used.
+- `max_distance`: The lowest value is used. If `min_distance` is greater than `max_distance`, the value of `min_distance` is used.
 - `step`: If there are negative step values, the lowest one is used, else the highest one is used.
 - `step_after`: Individual per rule. Effects the rule's `step`.
 
@@ -86,21 +89,25 @@ A basic config applicable to most servers struggling for MSPT performance.
     {
       "type": "MSPT",
       "min": 60,
+      "target": "VIEW",
       "step": -2  // 5.
     },
     {
       "type": "MSPT",
       "min": 50,
+      "target": "VIEW",
       "step": -1  // 4.
     },
     {
       "type": "MSPT",
       "max": 40,
+      "target": "VIEW",
       "step": 1  // 6.
     },
     {
       "type": "MSPT",
       "max": 30,
+      "target": "VIEW",
       "step": 2  // 7.
     }
   ]
@@ -129,17 +136,20 @@ A config that could be used, if a server is low on memory.
     {
       "type": "PLAYERS",
       "min": 2,
-      "max_view_distance": 15, // 3.
+      "target": "VIEW",
+      "max_distance": 15, // 3.
       "update_rate": 300  // 3.
     },
     {
       "type": "PLAYERS",
       "min": 3,
-      "max_view_distance": 12, // 4.
+      "target": "VIEW",
+      "max_distance": 12, // 4.
     },
     {
       "type": "MEMORY",
       "min": 90,
+      "target": "VIEW",
       "step": -1,  // 5.
       "step_after": 8,  // 5.
       "update_rate": 300
@@ -165,28 +175,33 @@ This config may e.g. be useful if you have specific Alt-Accounts that are always
     {
       "type": "PLAYERS",
       "value": "farmplayer1,farmplayer2",
-      "max_view_distance": 6,  // 2.
-      "min_view_distance": 6,  // 2.
+      "target": "VIEW",
+      "max_distance": 6,  // 2.
+      "min_distance": 6,  // 2.
       "update_rate": 6000  // 2.
     },
     {
       "type": "MSPT",
       "min": 60,
+      "target": "VIEW",
       "step": -2
     },
     {
       "type": "MSPT",
       "min": 50,
+      "target": "VIEW",
       "step": -1
     },
     {
       "type": "MSPT",
       "max": 40,
+      "target": "VIEW",
       "step": 1
     },
     {
       "type": "MSPT",
       "max": 30,
+      "target": "VIEW",
       "step": 2
     }
   ]
@@ -203,6 +218,8 @@ Option names followed by a `?` denote optional options.
   "update_rate": int[1..],
   "max_view_distance": int[2..32],
   "min_view_distance": int[2..32],
+  "max_sim_distance": int[2..32],
+  "min_sim_distance": int[2..32],
   "allow_on_clinet": boolean,
   "broadcast_changes_default": string[NONE/OPS/ALL],
   "broadcast_changes": [
@@ -214,13 +231,14 @@ Option names followed by a `?` denote optional options.
   ],
   "rules": [
     {
-      "type?": string[MSPT/MEMORY/PLAYERS],
+      "type": string[MSPT/MEMORY/PLAYERS],
       "value?": string,
       "max?": int[0..],
       "max?": int[0..],
+      "target": string[VIEW/SIMULATION],
       "update_rate?": int[1..],
-      "max_view_distance?": int[2..32],
-      "min_view_distance?": int[2..32],
+      "max_distance?": int[2..32],
+      "min_distance?": int[2..32],
       "step?": int,
       "step_after?": int[1..]
     }

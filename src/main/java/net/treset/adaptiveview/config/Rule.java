@@ -1,5 +1,6 @@
 package net.treset.adaptiveview.config;
 
+import com.google.gson.annotations.SerializedName;
 import net.treset.adaptiveview.tools.TextTools;
 
 import java.util.Arrays;
@@ -10,26 +11,32 @@ public class Rule {
     private String value;
     private Integer max;
     private Integer min;
+    private RuleTarget target;
     private Integer updateRate;
     private Integer step;
     private Integer stepAfter;
-    private Integer maxViewDistance;
-    private Integer minViewDistance;
+    @SerializedName(value = "max_distance", alternate = "max_view_distance")
+    private Integer maxDistance;
+    @SerializedName(value = "min_distance", alternate = "min_view_distance")
+    private Integer minDistance;
     private String name;
     private transient boolean valid = true;
     private transient int counter = 0;
 
-    public Rule(RuleType type, String value, Integer max, Integer min, Integer updateRate, Integer step, Integer stepAfter, Integer maxViewDistance, Integer minViewDistance, String name) {
+    public Rule(RuleType type, String value, Integer max, Integer min, RuleTarget target, Integer updateRate, Integer step, Integer stepAfter, Integer maxDistance, Integer minDistance, String name) {
         this.type = type;
         this.value = value;
         this.max = max;
         this.min = min;
+        this.target = target;
         this.updateRate = updateRate;
         this.step = step;
         this.stepAfter = stepAfter;
-        this.maxViewDistance = maxViewDistance;
-        this.minViewDistance = minViewDistance;
+        this.maxDistance = maxDistance;
+        this.minDistance = minDistance;
         this.name = name;
+
+        setDefaults();
     }
 
     public boolean isEffective() {
@@ -38,6 +45,8 @@ public class Rule {
     }
 
     private boolean isValid() {
+        setDefaults();
+
         switch(type) {
             case MSPT -> {
                 if(!checkMinMaxValues(0, 1000)) {
@@ -61,7 +70,13 @@ public class Rule {
                 }
             }
         }
-        return updateRate != null || step != null || maxViewDistance != null || minViewDistance != null;
+        return updateRate != null || step != null || maxDistance != null || minDistance != null;
+    }
+
+    private void setDefaults() {
+        if(target == null) {
+            target = RuleTarget.VIEW;
+        }
     }
 
     private boolean checkMinMaxValues(int minAllowed, int maxAllowed) {
@@ -165,6 +180,7 @@ public class Rule {
 
     public String toActionString() {
         StringBuilder sb = new StringBuilder();
+        sb.append(target.getName()).append(": ");
         int len = 0;
         if(updateRate != null) {
             sb.append("$bupdate_rate = ").append(updateRate).append("$b");
@@ -181,18 +197,18 @@ public class Rule {
                 sb.append(", $bstep_after = ").append(stepAfter).append("$b");
             }
         }
-        if(maxViewDistance != null) {
+        if(maxDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("$bmax_view_distance = ").append(maxViewDistance).append("$b");
+            sb.append("$bmax_distance = ").append(maxDistance).append("$b");
             len++;
         }
-        if(minViewDistance != null) {
+        if(minDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("$bmin_view_distance = ").append(minViewDistance).append("$b");
+            sb.append("$bmin_distance = ").append(minDistance).append("$b");
             len++;
         }
         if(len == 0) {
@@ -218,6 +234,14 @@ public class Rule {
     public void setType(RuleType type) {
         this.type = type;
         isEffective();
+    }
+
+    public RuleTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(RuleTarget target) {
+        this.target = target;
     }
 
     public String getValue() {
@@ -279,21 +303,21 @@ public class Rule {
         isEffective();
     }
 
-    public Integer getMaxViewDistance() {
-        return maxViewDistance;
+    public Integer getMaxDistance() {
+        return maxDistance;
     }
 
-    public void setMaxViewDistance(Integer maxViewDistance) {
-        this.maxViewDistance = maxViewDistance;
+    public void setMaxDistance(Integer maxDistance) {
+        this.maxDistance = maxDistance;
         isEffective();
     }
 
-    public Integer getMinViewDistance() {
-        return minViewDistance;
+    public Integer getMinDistance() {
+        return minDistance;
     }
 
-    public void setMinViewDistance(Integer minViewDistance) {
-        this.minViewDistance = minViewDistance;
+    public void setMinDistance(Integer minDistance) {
+        this.minDistance = minDistance;
         isEffective();
     }
 

@@ -2,6 +2,8 @@
   "update_rate": 600,
   "max_view_distance": 20,
   "min_view_distance": 4,
+  "max_sim_distance": 20,
+  "min_sim_distance": 4,
   "allow_on_client": false,
   "broadcast_to_ops": false,
   "broadcast_to": [],
@@ -9,21 +11,25 @@
     {
       "type": "MSPT",
       "min": 60,
+      "target": "VIEW",
       "step": -2
     },
     {
       "type": "MSPT",
       "min": 50,
+      "target": "VIEW",
       "step": -1
     },
     {
       "type": "MSPT",
       "max": 40,
+      "target": "VIEW",
       "step": 1
     },
     {
       "type": "MSPT",
       "max": 30,
+      "target": "VIEW",
       "step": 2
     }
   ]

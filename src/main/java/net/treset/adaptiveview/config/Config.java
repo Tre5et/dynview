@@ -22,6 +22,8 @@ public class Config {
     private int updateRate;
     private int maxViewDistance;
     private int minViewDistance;
+    private int maxSimDistance;
+    private int minSimDistance;
     private boolean allowOnClient;
     @SerializedName("broadcast_to_ops")
     @Expose(serialize = false)
@@ -35,10 +37,12 @@ public class Config {
 
     private transient boolean locked = false;
 
-    public Config(int updateRate, int maxViewDistance, int minViewDistance, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
+    public Config(int updateRate, int maxViewDistance, int minViewDistance, int maxSimDistance, int minSimDistance, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
+        this.maxSimDistance = maxSimDistance;
+        this.minSimDistance = minSimDistance;
         this.allowOnClient = allowOnClient;
         this.rules = rules;
         this.broadcastChangesDefault = broadcastChangesDefault;
@@ -52,6 +56,8 @@ public class Config {
             600,
             20,
             4,
+            20,
+            4,
             false,
             BroadcastLevel.NONE,
             new ArrayList<>(),
@@ -63,6 +69,7 @@ public class Config {
                             null,
                             null,
                             60,
+                            RuleTarget.VIEW,
                             null,
                             -2,
                             null,
@@ -75,6 +82,7 @@ public class Config {
                             null,
                             null,
                             50,
+                            RuleTarget.VIEW,
                             null,
                             -1,
                             null,
@@ -87,6 +95,7 @@ public class Config {
                             null,
                             40,
                             null,
+                            RuleTarget.VIEW,
                             null,
                             1,
                             null,
@@ -100,6 +109,7 @@ public class Config {
                             null,
                             30,
                             null,
+                            RuleTarget.VIEW,
                             null,
                             2,
                             null,
@@ -183,6 +193,8 @@ public class Config {
             oldConfig.getUpdateInterval(),
             oldConfig.getMaxViewDistance(),
             oldConfig.getMinViewDistance(),
+            oldConfig.getMaxViewDistance(),
+            oldConfig.getMinViewDistance(),
             oldConfig.isOverrideClient(),
             BroadcastLevel.NONE,
             new ArrayList<>(),
@@ -194,6 +206,7 @@ public class Config {
                             null,
                             null,
                             oldConfig.getMaxMsptAggressive(),
+                            RuleTarget.VIEW,
                             null,
                             -2,
                             null,
@@ -206,6 +219,7 @@ public class Config {
                             null,
                             null,
                             oldConfig.getMaxMspt(),
+                            RuleTarget.VIEW,
                             null,
                             -1,
                             null,
@@ -218,6 +232,7 @@ public class Config {
                             null,
                             oldConfig.getMinMspt(),
                             null,
+                            RuleTarget.VIEW,
                             null,
                             1,
                             null,
@@ -231,6 +246,7 @@ public class Config {
                             null,
                             oldConfig.getMinMsptAggressive(),
                             null,
+                            RuleTarget.VIEW,
                             null,
                             2,
                             null,
@@ -251,6 +267,8 @@ public class Config {
         this.updateRate = config.updateRate;
         this.maxViewDistance = config.maxViewDistance;
         this.minViewDistance = config.minViewDistance;
+        this.maxSimDistance = config.maxSimDistance;
+        this.minSimDistance = config.minSimDistance;
         this.allowOnClient = config.allowOnClient;
         this.broadcastChangesDefault = config.broadcastChangesDefault;
         this.broadcastChanges = config.broadcastChanges;
@@ -300,6 +318,30 @@ public class Config {
 
     public void setMinViewDistance(int minViewDistance) {
         this.minViewDistance = minViewDistance;
+    }
+
+    public int getMaxSimDistance() {
+        if(maxSimDistance == 0) {
+            setMaxSimDistance(maxViewDistance);
+            save();
+        }
+        return maxSimDistance;
+    }
+
+    public void setMaxSimDistance(int maxSimDistance) {
+        this.maxSimDistance = maxSimDistance;
+    }
+
+    public int getMinSimDistance() {
+        if(minSimDistance == 0) {
+            setMinSimDistance(minViewDistance);
+            save();
+        }
+        return minSimDistance;
+    }
+
+    public void setMinSimDistance(int minSimDistance) {
+        this.minSimDistance = minSimDistance;
     }
 
     public boolean isAllowOnClient() {

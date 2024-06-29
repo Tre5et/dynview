@@ -43,6 +43,7 @@ public class ServerHandler {
         if(tickCounter == nextUpdate) {
             ServerState state = new ServerState(
                     ViewDistanceHandler.getViewDistance(),
+                    ViewDistanceHandler.getSimDistance(),
                     (double)MathTools.longArrayAverage(tickLengths.toArray(new Long[0])) / 1000000d,
                     getMemory(),
                     getPlayers()

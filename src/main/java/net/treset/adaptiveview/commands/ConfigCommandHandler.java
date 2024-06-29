@@ -5,6 +5,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
+import net.treset.adaptiveview.config.RuleTarget;
 import net.treset.adaptiveview.config.RuleType;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
 import net.treset.adaptiveview.tools.BroadcastLevel;
@@ -562,22 +563,22 @@ public class ConfigCommandHandler {
 
     public int ruleMinView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Min View Distance of rule $b%d$b: $b%s$b", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Min View Distance of rule $b%d$b: $b%s$b", i, r.getMinDistance());
         });
     }
 
     public int ruleSetMinView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             Integer min = ctx.getArgument("chunks", Integer.class);
-            r.setMinViewDistance(min);
+            r.setMinDistance(min);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Min View Distance of rule $b%d$b to $b%s$b", i, r.getMinViewDistance());
+            TextTools.replyFormatted(ctx, "Set Min View Distance of rule $b%d$b to $b%s$b", i, r.getMinDistance());
         });
     }
 
     public int ruleClearMinView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            r.setMinViewDistance(null);
+            r.setMinDistance(null);
             config.save();
             TextTools.replyFormatted(ctx, "Cleared Min View Distance of rule $b%d$b", i);
         });
@@ -585,22 +586,22 @@ public class ConfigCommandHandler {
 
     public int ruleMaxView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Max View Distance of rule $b%d$b: $b%s$b", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Max View Distance of rule $b%d$b: $b%s$b", i, r.getMaxDistance());
         });
     }
 
     public int ruleSetMaxView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             Integer max = ctx.getArgument("chunks", Integer.class);
-            r.setMaxViewDistance(max);
+            r.setMaxDistance(max);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Max View Distance of rule $b%d$b to $b%s$b", i, r.getMaxViewDistance());
+            TextTools.replyFormatted(ctx, "Set Max View Distance of rule $b%d$b to $b%s$b", i, r.getMaxDistance());
         });
     }
 
     public int ruleClearMaxView(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            r.setMaxViewDistance(null);
+            r.setMaxDistance(null);
             config.save();
             TextTools.replyFormatted(ctx, "Cleared Max View Distance of rule $b%d$b", i);
         });
@@ -612,6 +613,7 @@ public class ConfigCommandHandler {
                 value,
                 max,
                 min,
+                RuleTarget.VIEW, //TODO
                 null,
                 null,
                 null,
