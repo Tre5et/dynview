@@ -6,10 +6,12 @@ import net.treset.adaptiveview.tools.TextTools;
 public abstract class Locker {
 
     private final LockManager lockManager;
+    private LockTarget target;
     private final int distance;
 
-    public Locker(int distance, LockManager lockManager) {
+    public Locker(int distance, LockTarget target, LockManager lockManager) {
         this.lockManager = lockManager;
+        this.target = target;
         this.distance = distance;
     }
 
@@ -23,6 +25,14 @@ public abstract class Locker {
 
     public int getDistance() {
         return distance;
+    }
+
+    public LockTarget getTarget() {
+        return target;
+    }
+
+    public void setTarget(LockTarget target) {
+        this.target = target;
     }
 
     public void beforeTick() {}

@@ -35,7 +35,8 @@ public class Config {
     private ArrayList<String> broadcastLock;
     private ArrayList<Rule> rules;
 
-    private transient boolean locked = false;
+    private transient boolean viewLocked = false;
+    private transient boolean simLocked = false;
 
     public Config(int updateRate, int maxViewDistance, int minViewDistance, int maxSimDistance, int minSimDistance, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
@@ -392,12 +393,20 @@ public class Config {
         this.rules = rules;
     }
 
-    public boolean isLocked() {
-        return locked;
+    public boolean isViewLocked() {
+        return viewLocked;
     }
 
-    public void setLocked(boolean locked) {
-        this.locked = locked;
+    public void setViewLocked(boolean viewLocked) {
+        this.viewLocked = viewLocked;
+    }
+
+    public boolean isSimLocked() {
+        return simLocked;
+    }
+
+    public void setSimLocked(boolean simLocked) {
+        this.simLocked = simLocked;
     }
 
     @Deprecated

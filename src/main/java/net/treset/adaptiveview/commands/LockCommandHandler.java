@@ -1,9 +1,11 @@
 package net.treset.adaptiveview.commands;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.AdaptiveViewMod;
@@ -21,73 +23,64 @@ public class LockCommandHandler {
         this.lockManager = lockManager;
     }
 
-    public int status(CommandContext<ServerCommandSource> ctx) {
-        Locker currentLocker = lockManager.getCurrentLocker();
-        int numLockers = lockManager.getNumLockers();
-        int lockedManually = lockManager.isLockedManually();
-
-        if(!config.isLocked()) {
-            TextTools.replyFormatted(ctx, "The View Distance is $bunlocked", false);
-            return 1;
-        }
-
-        if(lockedManually > 0) {
-            if(numLockers > 0) {
-                TextTools.replyFormatted(ctx, String.format("The View Distance is manually locked to $b%s chunks$b and there %s $b%s %s$b queued", lockedManually, (numLockers > 1)? "are" : "is", numLockers, (numLockers > 1)? "lockers" : "locker"), false);
-            } else TextTools.replyFormatted(ctx, String.format("The View Distance is manually locked to $b%s chunks", lockedManually), false);
-            return 1;
-        }
-
-        if(currentLocker != null) {
-            if(numLockers > 1) {
-                TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b until %s and $b%s other %s$b active", currentLocker.getDistance(), currentLocker.getLockedReason(), numLockers - 1, (numLockers > 2)? "lockers are" : "locker is"), false);
-            } else  TextTools.replyFormatted(ctx, String.format("The View Distance is locked to $b%s chunks$b until %s", currentLocker.getDistance(), currentLocker.getLockedReason()), false);
-            return 1;
-        }
-
-        TextTools.replyFormatted(ctx, String.format("The View Distance is currently locked to $b%s chunks", ViewDistanceHandler.getViewDistance()), false);
-        return 1;
-    }
-
-    public int set(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "$iLocks the View Distance to the provided chunks", false);
-        return 1;
-    }
-
     private void replyAndBroadcastLock(CommandContext<ServerCommandSource> ctx, String message, Object... args) {
         TextTools.replyAndBroadcastIf((p) -> LockManager.shouldBroadcastLock(p, config), ctx, message, args);
     }
 
-    public int setChunks(CommandContext<ServerCommandSource> ctx) {
+    private int lockStatus(CommandContext<ServerCommandSource> ctx, LockTarget target) {
+        Locker currentLocker = lockManager.getCurrentLocker(target);
+        int numLockers = lockManager.getNumLockers(target);
+        Integer lockedManually = lockManager.getLockedManually(target);
+
+        if(lockedManually == null && numLockers == 0) {
+            TextTools.replyFormatted(ctx, "The %s is $bunlocked", target.getPrettyString());
+            return 1;
+        } else if(lockedManually != null) {
+            StringBuilder sb = new StringBuilder(String.format("The %s is manually locked to $b%s chunks$b", target.getPrettyString(), lockedManually));
+            if(numLockers > 0) {
+                sb.append(String.format(" and there %s $b%s %s$b queued", (numLockers > 1)? "are" : "is", numLockers, (numLockers > 1)? "lockers" : "locker"));
+            }
+            TextTools.replyFormatted(ctx, sb.toString());
+        } else if(currentLocker != null) {
+            StringBuilder sb = new StringBuilder(String.format("The %s is locked to $b%s chunks$b until %s", target.getPrettyString(), currentLocker.getDistance(), currentLocker.getLockedReason()));
+            if(numLockers > 1) {
+                sb.append(String.format(" and $b%s other %s$b queued", numLockers - 1, (numLockers > 2)? "lockers are" : "locker is"));
+            }
+            TextTools.replyFormatted(ctx, sb.toString());
+        } else {
+            TextTools.replyError(ctx, "An error occurred while fetching the lock status");
+            return 0;
+        }
+        return 1;
+    }
+
+    private int status(CommandContext<ServerCommandSource> ctx) {
+        if(lockStatus(ctx, LockTarget.VIEW) == 1 && lockStatus(ctx, LockTarget.SIM) == 1) {
+            return 1;
+        }
+        return 0;
+    }
+
+    private int lock(CommandContext<ServerCommandSource> ctx, LockTarget target) {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
 
-        lockManager.lockManually(chunks);
+        lockManager.lockManually(chunks, target);
 
-        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks", chunks);
+        replyAndBroadcastLock(ctx, "Locked the %s to $b%s chunks", target.getPrettyString(), chunks);
         return 1;
     }
 
-    public int setChunksTimeout(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "$iThe View Distance will be unlocked after the provided amount of ticks", false);
-        return 1;
-    }
-
-    public int setChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
+    private int lockTimeout(CommandContext<ServerCommandSource> ctx, LockTarget target) {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
         int ticks = IntegerArgumentType.getInteger(ctx, "ticks");
 
-        lockManager.addLocker(new TimeoutLocker(chunks, ticks, lockManager));
+        lockManager.addLocker(new TimeoutLocker(chunks, ticks, target, lockManager));
 
-        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b for $b%s ticks", chunks, ticks);
+        replyAndBroadcastLock(ctx, "Locked the %s to $b%s chunks$b for $b%s ticks", target.getPrettyString(), chunks, ticks);
         return 1;
     }
 
-    public int setChunksPlayer(CommandContext<ServerCommandSource> ctx) {
-        TextTools.replyFormatted(ctx, "$iThe View Distance will be unlocked after the provided player disconnects or moves");
-        return 1;
-    }
-
-    public int setChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
+    private int lockPlayerDisconnect(CommandContext<ServerCommandSource> ctx, LockTarget target) {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
         ServerPlayerEntity player;
         try {
@@ -98,13 +91,13 @@ public class LockCommandHandler {
             return 0;
         }
 
-        lockManager.addLocker(new PlayerDisconnectLocker(player, chunks, lockManager));
+        lockManager.addLocker(new PlayerDisconnectLocker(player, chunks, target, lockManager));
 
-        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b until $b%s disconnects", chunks, player.getName().getString());
+        replyAndBroadcastLock(ctx, "Locked the %s to $b%s chunks$b until $b%s disconnects", target.getPrettyString(), chunks, player.getName().getString());
         return 1;
     }
 
-    public int setChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
+    private int lockPlayerMove(CommandContext<ServerCommandSource> ctx, LockTarget target) {
         int chunks = IntegerArgumentType.getInteger(ctx, "chunks");
         ServerPlayerEntity player;
         try {
@@ -115,55 +108,225 @@ public class LockCommandHandler {
             return 0;
         }
 
-        lockManager.addLocker(new PlayerMoveLocker(player, chunks, lockManager));
+        lockManager.addLocker(new PlayerMoveLocker(player, chunks, target, lockManager));
 
-        replyAndBroadcastLock(ctx, "Locked the View Distance to $b%s chunks$b until $b%s moves", chunks, player.getName().getString());
+        replyAndBroadcastLock(ctx, "Locked the %s to $b%s chunks$b until $b%s moves", target.getPrettyString(), chunks, player.getName().getString());
         return 1;
     }
 
-    public int unlock(CommandContext<ServerCommandSource> ctx) {
-        int numLocks = lockManager.getNumLockers();
-        int lockedManually = lockManager.isLockedManually();
+    private int unlock(CommandContext<ServerCommandSource> ctx, LockTarget target) {
+        int numLocks = lockManager.getNumLockers(target);
+        Integer lockedManually = lockManager.getLockedManually(target);
 
-        if(lockedManually == 0) {
-            TextTools.replyFormatted(ctx, "The View Distance isn't manually locked", true);
+        if(lockedManually == null) {
+            if(numLocks == 0) {
+                TextTools.replyFormatted(ctx, "The %s %sn't locked", target.getPrettyString(), target.getIs());
+                return 1;
+            } else {
+                TextTools.replyFormatted(ctx, "The %s %sn't locked manually but there %s %s %s active. Clear them with by appending 'clear' to this command", target.getPrettyString(), target.getIs(), (numLocks > 1)? "are" : "is", numLocks, (numLocks > 1)? "lockers": "locker");
+            }
             return 1;
         }
 
-        lockManager.unlockManually();
+        lockManager.lockManually(null, target);
 
         if(lockedManually > 0 && numLocks > 0) {
-            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance but there %s still $b%s %s$b active", (numLocks > 1)? "are" : "is", numLocks, (numLocks > 1)? "lockers": "locker");
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the %s but there %s still $b%s %s$b active", target.getPrettyString(), (numLocks > 1)? "are" : "is", numLocks, (numLocks > 1)? "lockers": "locker");
             return 1;
         }
 
-        replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance");
+        replyAndBroadcastLock(ctx, "$bUnlocked$b the %s", target.getPrettyString());
         return 1;
     }
 
-    public int clear(CommandContext<ServerCommandSource> ctx) {
-        int numLocks = lockManager.getNumLockers();
-        int lockedManually = lockManager.isLockedManually();
+    private int unlockClear(CommandContext<ServerCommandSource> ctx, LockTarget target) {
+        int numLocks = lockManager.getNumLockers(target);
+        Integer lockedManually = lockManager.getLockedManually(target);
 
-        if(numLocks == 0 && lockedManually == 0) {
-            TextTools.replyFormatted(ctx, "Nothing to unlock and no lockers to clear", true);
+        if(numLocks == 0 && lockedManually == null) {
+            TextTools.replyFormatted(ctx, "Nothing to unlock and no lockers to clear");
             return 1;
         }
 
-        lockManager.clear();
-        lockManager.unlockManually();
+        lockManager.clearLockers(target);
+        lockManager.lockManually(null, target);
 
-        if(lockedManually > 0 && numLocks > 0) {
-            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance and $bcleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker");
+        if(lockedManually != null && lockedManually > 0 && numLocks > 0) {
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the %s and $bcleared %s %s", target.getPrettyString(), numLocks, (numLocks > 1)? "lockers" : "locker");
             return 1;
         }
 
-        if(lockedManually > 0) {
-            replyAndBroadcastLock(ctx, "$bUnlocked$b the View Distance", true);
+        if(lockedManually != null && lockedManually > 0) {
+            replyAndBroadcastLock(ctx, "$bUnlocked$b the %s", target.getPrettyString());
             return 1;
         }
 
         replyAndBroadcastLock(ctx, "$bCleared %s %s", numLocks, (numLocks > 1)? "lockers" : "locker");
         return 1;
+    }
+
+    public int allChunks(CommandContext<ServerCommandSource> ctx) {
+        return lock(ctx, LockTarget.ALL);
+    }
+
+    public int allChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
+        return lockTimeout(ctx, LockTarget.ALL);
+    }
+
+    public int allChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerDisconnect(ctx, LockTarget.ALL);
+    }
+
+    public int allChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerMove(ctx, LockTarget.ALL);
+    }
+
+    public int viewChunks(CommandContext<ServerCommandSource> ctx) {
+        return lock(ctx, LockTarget.VIEW);
+    }
+
+    public int viewChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
+        return lockTimeout(ctx, LockTarget.VIEW);
+    }
+
+    public int viewChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerDisconnect(ctx, LockTarget.VIEW);
+    }
+
+    public int viewChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerMove(ctx, LockTarget.VIEW);
+    }
+
+    public int simChunks(CommandContext<ServerCommandSource> ctx) {
+        return lock(ctx, LockTarget.SIM);
+    }
+
+    public int simChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
+        return lockTimeout(ctx, LockTarget.SIM);
+    }
+
+    public int simChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerDisconnect(ctx, LockTarget.SIM);
+    }
+
+    public int simChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerMove(ctx, LockTarget.SIM);
+    }
+
+    public int unlockAll(CommandContext<ServerCommandSource> ctx) {
+        return unlock(ctx, LockTarget.ALL);
+    }
+
+    public int unlockAllClear(CommandContext<ServerCommandSource> ctx) {
+        return unlockClear(ctx, LockTarget.ALL);
+    }
+
+    public int unlockView(CommandContext<ServerCommandSource> ctx) {
+        return unlock(ctx, LockTarget.VIEW);
+    }
+
+    public int unlockViewClear(CommandContext<ServerCommandSource> ctx) {
+        return unlockClear(ctx, LockTarget.VIEW);
+    }
+
+    public int unlockSim(CommandContext<ServerCommandSource> ctx) {
+        return unlock(ctx, LockTarget.SIM);
+    }
+
+    public int unlockSimClear(CommandContext<ServerCommandSource> ctx) {
+        return unlockClear(ctx, LockTarget.SIM);
+    }
+
+    public LiteralArgumentBuilder<ServerCommandSource> getLockCommands() {
+        return CommandManager.literal("lock")
+                .executes(this::status)
+                .then(CommandManager.literal("status")
+                        .executes(this::status)
+                )
+                .then(CommandManager.literal("all")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::allChunks)
+                                .then(CommandManager.literal("timeout")
+                                        .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1))
+                                                .executes(this::allChunksTimeoutTicks)
+                                        )
+                                )
+                                .then(CommandManager.literal("player")
+                                        .then(CommandManager.argument("player", EntityArgumentType.player())
+                                                .then(CommandManager.literal("disconnect")
+                                                        .executes(this::allChunksPlayerDisconnect)
+                                                )
+                                                .then(CommandManager.literal("move")
+                                                        .executes(this::allChunksPlayerMove)
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .then(CommandManager.literal("view")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::viewChunks)
+                                .then(CommandManager.literal("timeout")
+                                        .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1))
+                                                .executes(this::viewChunksTimeoutTicks)
+                                        )
+                                )
+                                .then(CommandManager.literal("player")
+                                        .then(CommandManager.argument("player", EntityArgumentType.player())
+                                                .then(CommandManager.literal("disconnect")
+                                                        .executes(this::viewChunksPlayerDisconnect)
+                                                )
+                                                .then(CommandManager.literal("move")
+                                                        .executes(this::viewChunksPlayerMove)
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .then(CommandManager.literal("simulation")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::simChunks)
+                                .then(CommandManager.literal("timeout")
+                                        .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1))
+                                                .executes(this::simChunksTimeoutTicks)
+                                        )
+                                )
+                                .then(CommandManager.literal("player")
+                                        .then(CommandManager.argument("player", EntityArgumentType.player())
+                                                .then(CommandManager.literal("disconnect")
+                                                        .executes(this::simChunksPlayerDisconnect)
+                                                )
+                                                .then(CommandManager.literal("move")
+                                                        .executes(this::simChunksPlayerMove)
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .then(CommandManager.literal("unlock")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .executes(this::unlockAll)
+                        .then(CommandManager.literal("all")
+                                .executes(this::unlockAll)
+                                .then(CommandManager.literal("clear")
+                                        .executes(this::unlockAllClear)
+                                )
+                        )
+                        .then(CommandManager.literal("view")
+                                .executes(this::unlockView)
+                                .then(CommandManager.literal("clear")
+                                        .executes(this::unlockViewClear)
+                                )
+                        )
+                        .then(CommandManager.literal("simulation")
+                                .executes(this::unlockSim)
+                                .then(CommandManager.literal("clear")
+                                        .executes(this::unlockSimClear)
+                                )
+                        )
+                );
     }
 }

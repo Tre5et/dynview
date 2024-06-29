@@ -13,34 +13,115 @@ public class LockManager {
     private final Config config;
     private final ViewDistanceHandler viewDistanceHandler;
     private final List<Locker> lockers = new ArrayList<>();
-    private int lockedManually = 0;
+    private int viewLockedManually = 0;
+    private int simLockedManually = 0;
 
-    private Locker currentLocker = null;
+    private Locker currentViewLocker = null;
+    private Locker currentSimLocker = null;
 
     public LockManager(Config config, ViewDistanceHandler viewDistanceHandler) {
         this.config = config;
         this.viewDistanceHandler = viewDistanceHandler;
     }
 
-    public Locker getCurrentLocker() {
-        return currentLocker;
+    public void lockManually(Integer chunks, LockTarget target) {
+        if(target == LockTarget.VIEW || target == LockTarget.ALL) {
+            if(chunks == null || chunks == Integer.MAX_VALUE) {
+                viewLockedManually = 0;
+                lockView(Integer.MAX_VALUE);
+            } else {
+                viewLockedManually = chunks;
+                lockView(chunks);
+            }
+        }
+        if(target == LockTarget.SIM || target == LockTarget.ALL) {
+            if(chunks == null || chunks == Integer.MAX_VALUE) {
+                simLockedManually = 0;
+                lockSim(Integer.MAX_VALUE);
+            } else {
+                simLockedManually = chunks;
+                lockSim(chunks);
+            }
+        }
+        updateLocker();
     }
 
-    public int isLockedManually() { return lockedManually; }
-    public void lockManually(int chunks) {
-        lockedManually = chunks;
-        lock(chunks);
+    public Integer getLockedManually(LockTarget target) {
+        return switch (target) {
+            case VIEW -> viewLockedManually != 0 ? viewLockedManually : null;
+            case SIM -> simLockedManually != 0 ? simLockedManually : null;
+            case ALL -> {
+                if(viewLockedManually != 0 && simLockedManually != 0) {
+                    yield Math.min(viewLockedManually, simLockedManually);
+                } else if(viewLockedManually != 0) {
+                    yield viewLockedManually;
+                } else if(simLockedManually != 0) {
+                    yield simLockedManually;
+                } else {
+                    yield null;
+                }
+            }
+        };
     }
 
-    public int getNumLockers() { return lockers.size(); }
+    public Locker getCurrentLocker(LockTarget target) {
+        return switch (target) {
+            case VIEW -> currentViewLocker;
+            case SIM -> currentSimLocker;
+            case ALL -> {
+                if (currentViewLocker != null && currentSimLocker != null) {
+                    yield currentViewLocker.getDistance() < currentSimLocker.getDistance() ? currentViewLocker : currentSimLocker;
+                } else if (currentViewLocker != null) {
+                    yield currentViewLocker;
+                } else if (currentSimLocker != null) {
+                    yield currentSimLocker;
+                } else {
+                    yield null;
+                }
+            }
+        };
+    }
+
+    public int getNumLockers(LockTarget target) {
+        return switch (target) {
+            case VIEW -> (int) lockers.stream().filter(e -> e.getTarget() == LockTarget.VIEW || e.getTarget() == LockTarget.ALL).count();
+            case SIM -> (int) lockers.stream().filter(e -> e.getTarget() == LockTarget.SIM || e.getTarget() == LockTarget.ALL).count();
+            case ALL -> lockers.size();
+        };
+    }
 
     public void addLocker(Locker unlocker) {
         lockers.add(unlocker);
         updateLocker();
     }
 
-    public void clearLockers() {
-        lockers.clear();
+    public void clearLockers(LockTarget target) {
+        switch (target) {
+            case VIEW -> {
+                for(Locker e : lockers) {
+                    if(e.getTarget() == LockTarget.VIEW) {
+                        finishLocker(e);
+                    } else if(e.getTarget() == LockTarget.ALL) {
+                        e.setTarget(LockTarget.SIM);
+                    }
+                }
+            }
+            case SIM -> {
+                for(Locker e : lockers) {
+                    if(e.getTarget() == LockTarget.SIM) {
+                        finishLocker(e);
+                    } else if(e.getTarget() == LockTarget.ALL) {
+                        e.setTarget(LockTarget.VIEW);
+                    }
+                }
+            }
+            case ALL -> {
+                for(Locker e : lockers) {
+                    finishLocker(e);
+                }
+            }
+        }
+        updateLocker();
     }
 
 
@@ -50,51 +131,70 @@ public class LockManager {
     }
 
     public void updateLocker() {
-        if(isLockedManually() != 0) return;
+        if(getLockedManually(LockTarget.ALL) != null) return;
 
-        if(lockers.isEmpty()) {
-            clear();
-            return;
-        }
-
-        int smallestViewDistance = lockers.get(0).getDistance();
-        Locker newLocker = lockers.get(0);
+        ArrayList<Locker> viewLockers = new ArrayList<>();
+        ArrayList<Locker> simLockers = new ArrayList<>();
         for(Locker e : lockers) {
-            if(e.getDistance() < smallestViewDistance) {
-                smallestViewDistance = e.getDistance();
-                newLocker = e;
+            switch (e.getTarget()) {
+                case ALL -> {
+                    viewLockers.add(e);
+                    simLockers.add(e);
+                }
+                case VIEW -> viewLockers.add(e);
+                case SIM -> simLockers.add(e);
             }
         }
 
-        currentLocker = newLocker;
-        lock(smallestViewDistance);
-    }
+        if(getLockedManually(LockTarget.VIEW) == null) {
+            int viewDistance = Integer.MAX_VALUE;
+            Locker viewLocker = null;
 
-    public void lock(int chunks) {
-        if(ViewDistanceHandler.getViewDistance() != chunks) {
-            viewDistanceHandler.setViewDistance(chunks);
+            for(Locker e : viewLockers) {
+                if(e.getDistance() < viewDistance) {
+                    viewDistance = e.getDistance();
+                    viewLocker = e;
+                }
+            }
+
+            currentViewLocker = viewLocker;
+            lockView(viewDistance);
         }
-        config.setLocked(true);
+
+        if(getLockedManually(LockTarget.SIM) == null) {
+            int simDistance = Integer.MAX_VALUE;
+            Locker simLocker = null;
+
+            for(Locker e : simLockers) {
+                if(e.getDistance() < simDistance) {
+                    simDistance = e.getDistance();
+                    simLocker = e;
+                }
+            }
+
+            currentSimLocker = simLocker;
+            lockSim(simDistance);
+        }
     }
 
-    public void clear() {
-        clearLockers();
-
-        if(lockedManually > 0) {
-            lock(lockedManually);
-            currentLocker = null;
-        } else unlock();
+    public void lockView(int chunks) {
+        if(chunks == Integer.MAX_VALUE) {
+            currentViewLocker = null;
+            config.setViewLocked(false);
+        } else if(ViewDistanceHandler.getViewDistance() != chunks) {
+            viewDistanceHandler.setViewDistance(chunks);
+            config.setViewLocked(true);
+        }
     }
 
-    public void unlockManually() {
-        lockedManually = 0;
-        updateLocker();
-    }
-
-    public void unlock() {
-        currentLocker = null;
-
-        config.setLocked(false);
+    public void lockSim(int chunks) {
+        if(chunks == Integer.MAX_VALUE) {
+            currentSimLocker = null;
+            config.setViewLocked(false);
+        } else if(ViewDistanceHandler.getSimDistance() != chunks) {
+            viewDistanceHandler.setSimDistance(chunks);
+            config.setSimLocked(true);
+        }
     }
 
     public void onTick() {

@@ -11,9 +11,12 @@ All commands are accessible using `/adaptiveview`.
 `/adaptiveview lock` allows you to check if the View Distance is currently locked and allows to lock and unlock it.
 
 ### Locking
-`set [chunks] {[condition]}` allows you to lock the View Distance to the range specified in `chunks`.
+- `all [chunks] {[condition]}` locks the View Distance and Simulation Distance to `chunks`.
+- `view [chunks] {[condition]}` locks the View Distance to `chunks`.
+- `simulation [chunks] {[condition]}` locks the Simulation Distance to `chunks`.
 
-- `conditon` is a optional condition that allows you to specify when the View Distance lock is cleared. There are the following conditions:
+#### Conditions
+`conditon` is a optional condition that allows you to specify when the View Distance lock is cleared. There are the following conditions:
 
   - `player [name] disconnect` the specified player leaves the game
   - `player [name] move` the specified player moves
@@ -21,9 +24,11 @@ All commands are accessible using `/adaptiveview`.
 
 ### Unlocking
 
-- `unlock` clears all lock, that don't have a condition for automatic unlocking
+- `unlock all` clears all lock, that don't have a condition for automatic unlocking
+- `unlock view` clears all View Distance locks, that don't have a condition for automatic unlocking
+- `unlock simulation` clears all Simulation Distance locks, that don't have a condition for automatic unlocking
 
-- `unlock clear` clears all lock, also those that have a condition associated
+- `[unlock] clear` also clears the locks, that have a condition for automatic unlocking
 
 ## Config
 
@@ -56,7 +61,23 @@ adaptiveview
 |   |   |   unsubscribe
 |   lock
 |   |   status
-|   |   set +
+|   |   all +
+|   |   |   [chunks: int]
+|   |   |   |   timeout +
+|   |   |   |   |   [ticks: int]
+|   |   |   |   player +
+|   |   |   |   |   [player: player] +
+|   |   |   |   |   |   disconnect
+|   |   |   |   |   |   move
+|   |   view +
+|   |   |   [chunks: int]
+|   |   |   |   timeout +
+|   |   |   |   |   [ticks: int]
+|   |   |   |   player +
+|   |   |   |   |   [player: player] +
+|   |   |   |   |   |   disconnect
+|   |   |   |   |   |   move
+|   |   simulation +
 |   |   |   [chunks: int]
 |   |   |   |   timeout +
 |   |   |   |   |   [ticks: int]
@@ -65,7 +86,12 @@ adaptiveview
 |   |   |   |   |   |   disconnect
 |   |   |   |   |   |   move
 |   |   unlock
-|   |   |   clear
+|   |   |   all
+|   |   |   |   clear
+|   |   |   view
+|   |   |   |   clear
+|   |   |   simulation
+|   |   |   |   clear
 |   config
 |   |   status
 |   |   reload

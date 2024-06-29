@@ -6,8 +6,8 @@ import net.treset.adaptiveview.tools.Message;
 public class PlayerDisconnectLocker extends Locker {
     private final ServerPlayerEntity player;
 
-    public PlayerDisconnectLocker(ServerPlayerEntity player, int distance, LockManager lockManager) {
-        super(distance, lockManager);
+    public PlayerDisconnectLocker(ServerPlayerEntity player, int distance, LockTarget target, LockManager lockManager) {
+        super(distance, target, lockManager);
         this.player = player;
     }
 

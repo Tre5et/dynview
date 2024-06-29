@@ -96,7 +96,7 @@ public class ViewDistanceHandler {
         }
         int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + viewStep, minViewDistance, maxViewDistance);
 
-        if(targetViewDistance != state.getCurrentViewDistance() && !config.isLocked()) {
+        if(targetViewDistance != state.getCurrentViewDistance() && !config.isViewLocked()) {
             TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(viewDistanceIndexes));
             setViewDistance(targetViewDistance);
         }
@@ -112,7 +112,7 @@ public class ViewDistanceHandler {
         }
         int targetSimDistance = MathTools.clamp(state.getCurrentSimDistance() + simStep, minSimDistance, maxSimDistance);
 
-        if(targetSimDistance != state.getCurrentSimDistance() && !config.isLocked()) {
+        if(targetSimDistance != state.getCurrentSimDistance() && !config.isSimLocked()) {
             TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Simulation Distance from %d to %d because of %s.", state.getCurrentSimDistance(), targetSimDistance, getRuleCauseString(simDistanceIndexes));
             setSimDistance(targetSimDistance);
         }

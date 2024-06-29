@@ -8,8 +8,8 @@ public class PlayerMoveLocker extends Locker {
     private final ServerPlayerEntity player;
     private final Vec3d startPos;
 
-    public PlayerMoveLocker(ServerPlayerEntity player, int distance, LockManager lockManager) {
-        super(distance, lockManager);
+    public PlayerMoveLocker(ServerPlayerEntity player, int distance, LockTarget target, LockManager lockManager) {
+        super(distance, target, lockManager);
         this.player = player;
         this.startPos = player.getPos();
     }
