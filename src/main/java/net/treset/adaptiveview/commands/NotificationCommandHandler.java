@@ -206,8 +206,8 @@ public class NotificationCommandHandler {
         return 1;
     }
 
-    public LiteralArgumentBuilder<ServerCommandSource> getNotificationCommands() {
-        return CommandManager.literal("notifications")
+    public void registerCommands(LiteralArgumentBuilder<ServerCommandSource> builder) {
+        builder.then(CommandManager.literal("notifications")
                 .executes(this::notifications)
                 .then(CommandManager.literal("changes")
                         .executes(this::notificationsChanges)
@@ -226,6 +226,7 @@ public class NotificationCommandHandler {
                         .then(CommandManager.literal("unsubscribe")
                                 .executes(this::notificationsLockUnsubscribe)
                         )
-                );
+                )
+        );
     }
 }

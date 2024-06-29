@@ -567,8 +567,8 @@ public class ConfigCommandHandler {
         return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.SIMULATION);
     }
 
-    public LiteralArgumentBuilder<ServerCommandSource> getConfigCommands() {
-        return CommandManager.literal("config")
+    public void registerCommands(LiteralArgumentBuilder<ServerCommandSource> builder) {
+        builder.then(CommandManager.literal("config")
                 .requires(source -> source.hasPermissionLevel(2))
                 .executes(this::list)
                 .then(CommandManager.literal("status")
@@ -859,6 +859,7 @@ public class ConfigCommandHandler {
                                         )
                                 )
                         )
-                );
+                )
+        );
     }
 }

@@ -65,16 +65,16 @@ public class AdaptiveViewMod implements ModInitializer {
 				.executes(this::status)
 				.then(CommandManager.literal("status")
 						.executes(this::status)
-				)
-				.then(notificationCommandHandler.getNotificationCommands())
-				.then(configCommandHandler.getConfigCommands());
+				);
+		notificationCommandHandler.registerCommands(builder);
+		configCommandHandler.registerCommands(builder);
 		lockCommandHandler.registerCommands(builder);
 
 		dispatcher.register(builder);
 	}
 
 	private int status(CommandContext<ServerCommandSource> ctx) {
-		TextTools.replyFormatted(ctx, String.format("The current view distance is $b%s chunks", ViewDistanceHandler.getViewDistance()), false);
+		TextTools.replyFormatted(ctx, "The current view distance is $b%s chunks", ViewDistanceHandler.getViewDistance());
 		return 1;
 	}
 }
