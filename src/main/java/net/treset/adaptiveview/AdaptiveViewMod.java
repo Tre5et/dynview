@@ -1,6 +1,7 @@
 package net.treset.adaptiveview;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -60,15 +61,16 @@ public class AdaptiveViewMod implements ModInitializer {
 
 	private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher, CommandManager.RegistrationEnvironment environment) {
 		if(!environment.dedicated && !config.isAllowOnClient()) return;
-		dispatcher.register(CommandManager.literal("adaptiveview")
+		LiteralArgumentBuilder<ServerCommandSource> builder = CommandManager.literal("adaptiveview")
 				.executes(this::status)
 				.then(CommandManager.literal("status")
 						.executes(this::status)
 				)
 				.then(notificationCommandHandler.getNotificationCommands())
-				.then(configCommandHandler.getConfigCommands())
-				.then(lockCommandHandler.getLockCommands())
-		);
+				.then(configCommandHandler.getConfigCommands());
+		lockCommandHandler.registerCommands(builder);
+
+		dispatcher.register(builder);
 	}
 
 	private int status(CommandContext<ServerCommandSource> ctx) {

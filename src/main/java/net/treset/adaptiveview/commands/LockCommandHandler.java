@@ -10,7 +10,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
-import net.treset.adaptiveview.distance.ViewDistanceHandler;
 import net.treset.adaptiveview.tools.TextTools;
 import net.treset.adaptiveview.unlocking.*;
 
@@ -237,8 +236,8 @@ public class LockCommandHandler {
         return unlockClear(ctx, LockTarget.SIM);
     }
 
-    public LiteralArgumentBuilder<ServerCommandSource> getLockCommands() {
-        return CommandManager.literal("lock")
+    public void registerCommands(LiteralArgumentBuilder<ServerCommandSource> builder) {
+        builder.then(CommandManager.literal("lock")
                 .executes(this::status)
                 .then(CommandManager.literal("status")
                         .executes(this::status)
@@ -306,27 +305,28 @@ public class LockCommandHandler {
                                 )
                         )
                 )
-                .then(CommandManager.literal("unlock")
-                        .requires(source -> source.hasPermissionLevel(2))
+        )
+        .then(CommandManager.literal("unlock")
+                .requires(source -> source.hasPermissionLevel(2))
+                .executes(this::unlockAll)
+                .then(CommandManager.literal("all")
                         .executes(this::unlockAll)
-                        .then(CommandManager.literal("all")
-                                .executes(this::unlockAll)
-                                .then(CommandManager.literal("clear")
-                                        .executes(this::unlockAllClear)
-                                )
+                        .then(CommandManager.literal("clear")
+                                .executes(this::unlockAllClear)
                         )
-                        .then(CommandManager.literal("view")
-                                .executes(this::unlockView)
-                                .then(CommandManager.literal("clear")
-                                        .executes(this::unlockViewClear)
-                                )
+                )
+                .then(CommandManager.literal("view")
+                        .executes(this::unlockView)
+                        .then(CommandManager.literal("clear")
+                                .executes(this::unlockViewClear)
                         )
-                        .then(CommandManager.literal("simulation")
-                                .executes(this::unlockSim)
-                                .then(CommandManager.literal("clear")
-                                        .executes(this::unlockSimClear)
-                                )
+                )
+                .then(CommandManager.literal("simulation")
+                        .executes(this::unlockSim)
+                        .then(CommandManager.literal("clear")
+                                .executes(this::unlockSimClear)
                         )
-                );
+                )
+        );
     }
 }

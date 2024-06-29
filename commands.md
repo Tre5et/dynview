@@ -8,9 +8,8 @@ All commands are accessible using `/adaptiveview`.
 
 ## Lock
 
-`/adaptiveview lock` allows you to check if the View Distance is currently locked and allows to lock and unlock it.
+`/adaptiveview lock` allows you to check if the View or Simulation Distance is currently locked and allows to lock it.
 
-### Locking
 - `all [chunks] {[condition]}` locks the View Distance and Simulation Distance to `chunks`.
 - `view [chunks] {[condition]}` locks the View Distance to `chunks`.
 - `simulation [chunks] {[condition]}` locks the Simulation Distance to `chunks`.
@@ -22,11 +21,13 @@ All commands are accessible using `/adaptiveview`.
   - `player [name] move` the specified player moves
   - `timeout [ticks]` the specified time in ticks has passed
 
-### Unlocking
+## Unlock
 
-- `unlock all` clears all lock, that don't have a condition for automatic unlocking
-- `unlock view` clears all View Distance locks, that don't have a condition for automatic unlocking
-- `unlock simulation` clears all Simulation Distance locks, that don't have a condition for automatic unlocking
+`/adaptiveview unlock` allows you to unlock the View and Simulation Distance.
+
+- `all` clears all lock, that don't have a condition for automatic unlocking
+- `view` clears all View Distance locks, that don't have a condition for automatic unlocking
+- `simulation` clears all Simulation Distance locks, that don't have a condition for automatic unlocking
 
 - `[unlock] clear` also clears the locks, that have a condition for automatic unlocking
 
@@ -85,13 +86,13 @@ adaptiveview
 |   |   |   |   |   [player: player] +
 |   |   |   |   |   |   disconnect
 |   |   |   |   |   |   move
-|   |   unlock
-|   |   |   all
-|   |   |   |   clear
-|   |   |   view
-|   |   |   |   clear
-|   |   |   simulation
-|   |   |   |   clear
+|   unlock
+|   |   all
+|   |   |   clear
+|   |   view
+|   |   |   clear
+|   |   simulation
+|   |   |   clear
 |   config
 |   |   status
 |   |   reload
