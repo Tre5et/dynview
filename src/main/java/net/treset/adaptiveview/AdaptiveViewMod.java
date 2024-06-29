@@ -11,6 +11,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.treset.adaptiveview.commands.ConfigCommandHandler;
 import net.treset.adaptiveview.commands.LockCommandHandler;
+import net.treset.adaptiveview.commands.NotificationCommandHandler;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.distance.ServerHandler;
 import net.treset.adaptiveview.distance.ViewDistanceHandler;
@@ -23,6 +24,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("adaptiveview");
 
 	private static final Config config = Config.loadOrDefault();
+	private static final NotificationCommandHandler notificationCommandHandler = new NotificationCommandHandler(config);
 	private static final ConfigCommandHandler configCommandHandler = new ConfigCommandHandler(config);
 	private static final ViewDistanceHandler viewDistanceHandler = new ViewDistanceHandler(config);
 	private static final LockManager lockManager = new LockManager(config, viewDistanceHandler);
@@ -63,27 +65,7 @@ public class AdaptiveViewMod implements ModInitializer {
 				.then(CommandManager.literal("status")
 						.executes(this::status)
 				)
-				.then(CommandManager.literal("notifications")
-						.executes(configCommandHandler::notifications)
-						.then(CommandManager.literal("changes")
-								.executes(configCommandHandler::notificationsChanges)
-								.then(CommandManager.literal("subscribe")
-										.executes(configCommandHandler::notificationsChangesSubscribe)
-								)
-								.then(CommandManager.literal("unsubscribe")
-										.executes(configCommandHandler::notificationsChangesUnsubscribe)
-								)
-						)
-						.then(CommandManager.literal("lock")
-								.executes(configCommandHandler::notificationsLock)
-								.then(CommandManager.literal("subscribe")
-										.executes(configCommandHandler::notificationsLockSubscribe)
-								)
-								.then(CommandManager.literal("unsubscribe")
-										.executes(configCommandHandler::notificationsLockUnsubscribe)
-								)
-						)
-				)
+				.then(notificationCommandHandler.getNotificationCommands())
 				.then(configCommandHandler.getConfigCommands())
 				.then(lockCommandHandler.getLockCommands())
 		);
