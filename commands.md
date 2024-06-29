@@ -130,6 +130,9 @@ adaptiveview
 |   |   |   |   |   |   [max: int]
 |   |   |   |   |   |   clear
 |   |   |   |   action
+|   |   |   |   |   target
+|   |   |   |   |   |   view
+|   |   |   |   |   |   simulation
 |   |   |   |   |   update_rate
 |   |   |   |   |   |   [ticks: int]
 |   |   |   |   |   |   clear
@@ -148,28 +151,48 @@ adaptiveview
 |   |   |   add +
 |   |   |   |   mspt +
 |   |   |   |   |   min +
-|   |   |   |   |   |   [min: int]
+|   |   |   |   |   |   [min: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   max + 
-|   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   range +
 |   |   |   |   |   |   [min: int] +
-|   |   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   |   simulation
 |   |   |   |   memory +
 |   |   |   |   |   min +
-|   |   |   |   |   |   [min: int]
+|   |   |   |   |   |   [min: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   max + 
-|   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   range +
 |   |   |   |   |   |   [min: int] +
-|   |   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   |   simulation
 |   |   |   |   players +
 |   |   |   |   |   min +
-|   |   |   |   |   |   [min: int]
+|   |   |   |   |   |   [min: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   max + 
-|   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 |   |   |   |   |   range +
 |   |   |   |   |   |   [min: int] +
-|   |   |   |   |   |   |   [max: int]
+|   |   |   |   |   |   |   [max: int] +
+|   |   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   |   simulation
 |   |   |   |   |   names +
-|   |   |   |   |   |   [names: string]
+|   |   |   |   |   |   [names: string] +
+|   |   |   |   |   |   |   view
+|   |   |   |   |   |   |   simulation
 ```

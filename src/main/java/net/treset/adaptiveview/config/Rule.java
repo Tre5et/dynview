@@ -180,7 +180,7 @@ public class Rule {
 
     public String toActionString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(target.getName()).append(": ");
+        sb.append("$b").append(target.getName()).append("$b").append(": ");
         int len = 0;
         if(updateRate != null) {
             sb.append("$bupdate_rate = ").append(updateRate).append("$b");

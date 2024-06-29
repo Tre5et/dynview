@@ -1,6 +1,10 @@
 package net.treset.adaptiveview.commands;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.config.Config;
@@ -492,6 +496,28 @@ public class ConfigCommandHandler {
         });
     }
 
+    public int ruleTarget(CommandContext<ServerCommandSource> ctx) {
+        return performRuleAction(ctx, (i, r) -> {
+            TextTools.replyFormatted(ctx, "Action Target of rule $b%d$b: $b%s$b", i, r.getTarget().getName());
+        });
+    }
+
+    private int ruleSetTarget(CommandContext<ServerCommandSource> ctx, RuleTarget target) {
+        return performRuleAction(ctx, (i, r) -> {
+            r.setTarget(target);
+            config.save();
+            TextTools.replyFormatted(ctx, "Set Action Target of rule $b%d$b to $b%s$b", i, r.getTarget().getName());
+        });
+    }
+
+    public int ruleSetTargetView(CommandContext<ServerCommandSource> ctx) {
+        return ruleSetTarget(ctx, RuleTarget.VIEW);
+    }
+
+    public int ruleSetTargetSim(CommandContext<ServerCommandSource> ctx) {
+        return ruleSetTarget(ctx, RuleTarget.SIMULATION);
+    }
+
     public int ruleUpdateRate(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             TextTools.replyFormatted(ctx, "Update Rate of rule $b%d$b: $b%s$b", i, r.getUpdateRate());
@@ -607,13 +633,13 @@ public class ConfigCommandHandler {
         });
     }
 
-    private int addRule(CommandContext<ServerCommandSource> ctx, RuleType type, String value, Integer max, Integer min) {
+    private int addRule(CommandContext<ServerCommandSource> ctx, RuleType type, String value, Integer max, Integer min, RuleTarget target) {
         Rule r = new Rule(
                 type,
                 value,
                 max,
                 min,
-                RuleTarget.VIEW, //TODO
+                target,
                 null,
                 null,
                 null,
@@ -627,56 +653,404 @@ public class ConfigCommandHandler {
         return 1;
     }
 
-    public int addMsptMin(CommandContext<ServerCommandSource> ctx) {
+    public int addMsptMinView(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.MSPT, null, null, min);
+        return addRule(ctx, RuleType.MSPT, null, null, min, RuleTarget.VIEW);
     }
 
-    public int addMsptMax(CommandContext<ServerCommandSource> ctx) {
+    public int addMsptMinSim(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addMsptMaxView(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.MSPT, null, max, null);
+        return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.VIEW);
     }
 
-    public int addMsptRange(CommandContext<ServerCommandSource> ctx) {
-        Integer min = ctx.getArgument("min", Integer.class);
+    public int addMsptMaxSim(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.MSPT, null, max, min);
+        return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.SIMULATION);
     }
 
-    public int addMemoryMin(CommandContext<ServerCommandSource> ctx) {
-        Integer min = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.MEMORY, null, null, min);
-    }
-
-    public int addMemoryMax(CommandContext<ServerCommandSource> ctx) {
-        Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.MEMORY, null, max, null);
-    }
-
-    public int addMemoryRange(CommandContext<ServerCommandSource> ctx) {
+    public int addMsptRangeView(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.MEMORY, null, max, min);
+        return addRule(ctx, RuleType.MSPT, null, max, min, RuleTarget.VIEW);
     }
 
-    public int addPlayersMin(CommandContext<ServerCommandSource> ctx) {
-        Integer min = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.PLAYERS, null, null, min);
-    }
-
-    public int addPlayersMax(CommandContext<ServerCommandSource> ctx) {
-        Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.PLAYERS, null, max, null);
-    }
-
-    public int addPlayersRange(CommandContext<ServerCommandSource> ctx) {
+    public int addMsptRangeSim(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         Integer max = ctx.getArgument("max", Integer.class);
-        return addRule(ctx, RuleType.PLAYERS, null, max, min);
+        return addRule(ctx, RuleType.MSPT, null, max, min, RuleTarget.SIMULATION);
     }
 
-    public int addPlayersName(CommandContext<ServerCommandSource> ctx) {
+    public int addMemoryMinView(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, null, min, RuleTarget.VIEW);
+    }
+
+    public int addMemoryMinSim(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addMemoryMaxView(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.VIEW);
+    }
+
+    public int addMemoryMaxSim(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addMemoryRangeView(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, min, RuleTarget.VIEW);
+    }
+
+    public int addMemoryRangeSim(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, min, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersMinView(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, null, min, RuleTarget.VIEW);
+    }
+
+    public int addPlayersMinSim(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersMaxView(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.VIEW);
+    }
+
+    public int addPlayersMaxSim(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersRangeView(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, min, RuleTarget.VIEW);
+    }
+
+    public int addPlayersRangeSim(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, min, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersNameView(CommandContext<ServerCommandSource> ctx) {
         String name = ctx.getArgument("names", String.class);
-        return addRule(ctx, RuleType.PLAYERS, name, null, null);
+        return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.VIEW);
+    }
+
+    public int addPlayersNameSim(CommandContext<ServerCommandSource> ctx) {
+        String name = ctx.getArgument("names", String.class);
+        return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.SIMULATION);
+    }
+
+    public LiteralArgumentBuilder<ServerCommandSource> getConfigCommands() {
+        return CommandManager.literal("config")
+                .requires(source -> source.hasPermissionLevel(2))
+                .executes(this::list)
+                .then(CommandManager.literal("status")
+                        .executes(this::list)
+                )
+                .then(CommandManager.literal("reload")
+                        .executes(this::reload)
+                )
+                .then(CommandManager.literal("update_rate")
+                        .executes(this::updateRate)
+                        .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1, 72000))
+                                .executes(this::setUpdateRate)
+                        )
+                )
+                .then(CommandManager.literal("max_view_distance")
+                        .executes(this::maxView)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMaxView)
+                        )
+                )
+                .then(CommandManager.literal("min_view_distance")
+                        .executes(this::minView)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMinView)
+                        )
+                )
+                .then(CommandManager.literal("broadcast_changes")
+                        .executes(this::broadcastChanges)
+                        .then(CommandManager.literal("none")
+                                .executes(this::broadcastChangesNone)
+                        )
+                        .then(CommandManager.literal("ops")
+                                .executes(this::broadcastChangesOps)
+                        )
+                        .then(CommandManager.literal("all")
+                                .executes(this::broadcastChangesAll)
+                        )
+                )
+                .then(CommandManager.literal("broadcast_lock")
+                        .executes(this::broadcastLock)
+                        .then(CommandManager.literal("none")
+                                .executes(this::broadcastLockNone)
+                        )
+                        .then(CommandManager.literal("ops")
+                                .executes(this::broadcastLockOps)
+                        )
+                        .then(CommandManager.literal("all")
+                                .executes(this::broadcastLockAll)
+                        )
+                )
+                .then(CommandManager.literal("rules")
+                        .executes(this::rules)
+                        .then(CommandManager.argument("index", IntegerArgumentType.integer(1, 100))
+                                .executes(this::ruleIndex)
+                                .then(CommandManager.literal("remove")
+                                        .executes(this::ruleRemove)
+                                )
+                                .then(CommandManager.literal("name")
+                                        .executes(this::ruleName)
+                                        .then(CommandManager.argument("name", StringArgumentType.greedyString())
+                                                .executes(this::ruleSetName)
+                                        )
+                                        .then(CommandManager.literal("clear")
+                                                .executes(this::ruleClearName)
+                                        )
+                                )
+                                .then(CommandManager.literal("condition")
+                                        .executes(this::ruleCondition)
+                                        .then(CommandManager.literal("type")
+                                                .executes(this::ruleType)
+                                                .then(CommandManager.literal("mspt")
+                                                        .executes(this::ruleTypeSetMspt)
+                                                )
+                                                .then(CommandManager.literal("memory")
+                                                        .executes(this::ruleTypeSetMemory)
+                                                )
+                                                .then(CommandManager.literal("players")
+                                                        .executes(this::ruleTypeSetPlayers)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("value")
+                                                .executes(this::ruleValue)
+                                                .then(CommandManager.argument("value", StringArgumentType.greedyString())
+                                                        .executes(this::ruleSetValue)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearValue)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("min")
+                                                .executes(this::ruleMin)
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0))
+                                                        .executes(this::ruleSetMin)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearMin)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("max")
+                                                .executes(this::ruleMax)
+                                                .then(CommandManager.argument("max", IntegerArgumentType.integer(0))
+                                                        .executes(this::ruleSetMax)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearMax)
+                                                )
+                                        )
+                                )
+                                .then(CommandManager.literal("action")
+                                        .executes(this::ruleAction)
+                                        .then(CommandManager.literal("target")
+                                                .executes(this::ruleTarget)
+                                                .then(CommandManager.literal("view")
+                                                        .executes(this::ruleSetTargetView)
+                                                )
+                                                .then(CommandManager.literal("simulation")
+                                                        .executes(this::ruleSetTargetSim)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("update_rate")
+                                                .executes(this::ruleUpdateRate)
+                                                .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1, 72000))
+                                                        .executes(this::ruleSetUpdateRate)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearUpdateRate)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("step")
+                                                .executes(this::ruleStep)
+                                                .then(CommandManager.argument("step", IntegerArgumentType.integer(-32, 32))
+                                                        .executes(this::ruleSetStep)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearStep)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("step_after")
+                                                .executes(this::ruleStepAfter)
+                                                .then(CommandManager.argument("step_after", IntegerArgumentType.integer(1, 100))
+                                                        .executes(this::ruleSetStepAfter)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearStepAfter)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("min_view_distance")
+                                                .executes(this::ruleMinView)
+                                                .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                                        .executes(this::ruleSetMinView)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearMinView)
+                                                )
+                                        )
+                                        .then(CommandManager.literal("max_view_distance")
+                                                .executes(this::ruleMaxView)
+                                                .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                                        .executes(this::ruleSetMaxView)
+                                                )
+                                                .then(CommandManager.literal("clear")
+                                                        .executes(this::ruleClearMaxView)
+                                                )
+                                        )
+                                )
+                        )
+                        .then(CommandManager.literal("add")
+                                .then(CommandManager.literal("mspt")
+                                        .then(CommandManager.literal("min")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 1000))
+                                                        .executes(this::addMsptMinView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addMsptMinView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addMsptMinSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("max")
+                                                .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 1000))
+                                                        .executes(this::addMsptMaxView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addMsptMaxView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addMsptMaxSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("range")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 1000))
+                                                        .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 1000))
+                                                                .executes(this::addMsptRangeView)
+                                                                .then(CommandManager.literal("view")
+                                                                        .executes(this::addMsptRangeView)
+                                                                )
+                                                                .then(CommandManager.literal("simulation")
+                                                                        .executes(this::addMsptRangeSim)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                                .then(CommandManager.literal("memory")
+                                        .then(CommandManager.literal("min")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 100))
+                                                        .executes(this::addMemoryMinView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addMemoryMinView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addMemoryMinSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("max")
+                                                .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 100))
+                                                        .executes(this::addMemoryMaxView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addMemoryMaxView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addMemoryMaxSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("range")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 100))
+                                                        .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 100))
+                                                                .executes(this::addMemoryRangeView)
+                                                                .then(CommandManager.literal("view")
+                                                                        .executes(this::addMemoryRangeView)
+                                                                )
+                                                                .then(CommandManager.literal("simulation")
+                                                                        .executes(this::addMemoryRangeSim)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                                .then(CommandManager.literal("players")
+                                        .then(CommandManager.literal("min")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 1000))
+                                                        .executes(this::addPlayersMinView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addPlayersMinView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addPlayersMinSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("max")
+                                                .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 1000))
+                                                        .executes(this::addPlayersMaxView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addPlayersMaxView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addPlayersMaxSim)
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("range")
+                                                .then(CommandManager.argument("min", IntegerArgumentType.integer(0, 1000))
+                                                        .then(CommandManager.argument("max", IntegerArgumentType.integer(0, 1000))
+                                                                .executes(this::addPlayersRangeView)
+                                                                .then(CommandManager.literal("view")
+                                                                        .executes(this::addPlayersRangeView)
+                                                                )
+                                                                .then(CommandManager.literal("simulation")
+                                                                        .executes(this::addPlayersRangeSim)
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                        .then(CommandManager.literal("names")
+                                                .then(CommandManager.argument("names", StringArgumentType.greedyString())
+                                                        .executes(this::addPlayersNameView)
+                                                        .then(CommandManager.literal("view")
+                                                                .executes(this::addPlayersNameView)
+                                                        )
+                                                        .then(CommandManager.literal("simulation")
+                                                                .executes(this::addPlayersNameSim)
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                );
     }
 }
