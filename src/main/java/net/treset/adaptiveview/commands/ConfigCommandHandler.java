@@ -84,6 +84,32 @@ public class ConfigCommandHandler {
         return 1;
     }
 
+    public int maxSim(CommandContext<ServerCommandSource> ctx) {
+        TextTools.replyFormatted(ctx, "Max Simulation Distance: $b%s chunks", config.getMaxSimDistance());
+        return 1;
+    }
+
+    public int setMaxSim(CommandContext<ServerCommandSource> ctx) {
+        Integer chunks = ctx.getArgument("chunks", Integer.class);
+        config.setMaxSimDistance(chunks);
+        config.save();
+        TextTools.replyFormatted(ctx, "Set Max Simulation Distance to $b%s chunks", config.getMaxSimDistance());
+        return 1;
+    }
+
+    public int minSim(CommandContext<ServerCommandSource> ctx) {
+        TextTools.replyFormatted(ctx, "Min Simulation Distance: $b%s chunks", config.getMinSimDistance());
+        return 1;
+    }
+
+    public int setMinSim(CommandContext<ServerCommandSource> ctx) {
+        Integer chunks = ctx.getArgument("chunks", Integer.class);
+        config.setMinSimDistance(chunks);
+        config.save();
+        TextTools.replyFormatted(ctx, "Set Min Simulation Distance to $b%s chunks", config.getMinSimDistance());
+        return 1;
+    }
+
     public int broadcastChanges(CommandContext<ServerCommandSource> ctx) {
         TextTools.replyFormatted(ctx, "Broadcasting view distance changes to $b%s", switch(config.getBroadcastChangesDefault()) {
             case ALL -> "all players";
@@ -593,6 +619,18 @@ public class ConfigCommandHandler {
                         .executes(this::minView)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMinView)
+                        )
+                )
+                .then(CommandManager.literal("max_simulation_distance")
+                        .executes(this::maxSim)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMaxSim)
+                        )
+                )
+                .then(CommandManager.literal("min_simulation_distance")
+                        .executes(this::minSim)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMinSim)
                         )
                 )
                 .then(CommandManager.literal("broadcast_changes")
