@@ -74,7 +74,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	}
 
 	private int status(CommandContext<ServerCommandSource> ctx) {
-		TextTools.replyFormatted(ctx, "The current view distance is $b%s chunks", ViewDistanceHandler.getViewDistance());
+		TextTools.replyFormatted(ctx, "The current view distance is $b%s chunks$b and the current simulation distance is $b%s chunks$b", ViewDistanceHandler.getViewDistance(), ViewDistanceHandler.getSimDistance());
 		return 1;
 	}
 }

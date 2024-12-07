@@ -5,8 +5,10 @@
   "max_sim_distance": 20,
   "min_sim_distance": 4,
   "allow_on_client": false,
-  "broadcast_to_ops": false,
-  "broadcast_to": [],
+  "broadcast_changes_default": "NONE",
+  "broadcast_changes": [],
+  "broadcast_lock_default": "OPS",
+  "broadcast_lock": [],
   "rules": [
     {
       "type": "MSPT",
