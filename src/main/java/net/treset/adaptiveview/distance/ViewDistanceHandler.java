@@ -6,7 +6,6 @@ import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
 import net.treset.adaptiveview.config.RuleTarget;
 import net.treset.adaptiveview.config.ServerState;
-import net.treset.adaptiveview.tools.MathTools;
 import net.treset.adaptiveview.tools.NotificationState;
 import net.treset.adaptiveview.tools.TextTools;
 
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewDistanceHandler {
+
     private final Config config;
 
     public ViewDistanceHandler(Config config) {
@@ -25,6 +25,7 @@ public class ViewDistanceHandler {
         ArrayList<Integer> viewDistanceIndexes = new ArrayList<>();
         ArrayList<Rule> simDistanceRules = new ArrayList<>();
         ArrayList<Integer> simDistanceIndexes = new ArrayList<>();
+
         for(int i = 0; i < config.getRules().size(); i++) {
             Rule rule = config.getRules().get(i);
             if(rule.applies(state)) {
@@ -38,89 +39,25 @@ public class ViewDistanceHandler {
             }
         }
 
-        int maxViewDistance = Integer.MAX_VALUE;
-        int minViewDistance = 0;
-        int viewStep = 0;
-        int updateRate = Integer.MAX_VALUE;
-        for(Rule rule : viewDistanceRules) {
-            if(rule.getMaxDistance() != null && rule.getMaxDistance() < maxViewDistance) {
-                maxViewDistance = rule.getMaxDistance();
-            }
-            if(rule.getMinDistance() != null && rule.getMinDistance() > minViewDistance) {
-                minViewDistance = rule.getMinDistance();
-            }
-            if(rule.getUpdateRate() != null && rule.getUpdateRate() < updateRate) {
-                updateRate = rule.getUpdateRate();
-            }
-            if(rule.getStep() != null) {
-                rule.incrementCounter();
-                if(rule.getStep() < 0 && rule.getStep() < viewStep) {
-                    viewStep = rule.getStep();
-                } else if(rule.getStep() > 0 && rule.getStep() > viewStep) {
-                    viewStep = rule.getStep();
-                }
-            }
-        }
+        DistanceData viewDistanceData = DistanceData.extract(viewDistanceRules, config.getMaxViewDistance(), config.getMinViewDistance());
+        DistanceData simDistanceData = DistanceData.extract(simDistanceRules, config.getMaxSimDistance(), config.getMinSimDistance());
 
-        int maxSimDistance = Integer.MAX_VALUE;
-        int minSimDistance = 0;
-        int simStep = 0;
-        for(Rule rule : simDistanceRules) {
-            if(rule.getMaxDistance() != null && rule.getMaxDistance() < maxViewDistance) {
-                maxSimDistance = rule.getMaxDistance();
-            }
-            if(rule.getMinDistance() != null && rule.getMinDistance() > minViewDistance) {
-                minSimDistance = rule.getMinDistance();
-            }
-            if(rule.getUpdateRate() != null && rule.getUpdateRate() < updateRate) {
-                updateRate = rule.getUpdateRate();
-            }
-            if(rule.getStep() != null) {
-                rule.incrementCounter();
-                if(rule.getStep() < 0 && rule.getStep() < viewStep) {
-                    simStep = rule.getStep();
-                } else if(rule.getStep() > 0 && rule.getStep() > viewStep) {
-                    simStep = rule.getStep();
-                }
-            }
-        }
-
-        if(maxViewDistance == Integer.MAX_VALUE) {
-            maxViewDistance = config.getMaxViewDistance();
-        }
-        if(minViewDistance == 0) {
-            minViewDistance = config.getMinViewDistance();
-        }
-        if(maxViewDistance < minViewDistance) {
-            maxViewDistance = minViewDistance;
-        }
-        int targetViewDistance = MathTools.clamp(state.getCurrentViewDistance() + viewStep, minViewDistance, maxViewDistance);
-
+        int targetViewDistance = viewDistanceData.getTargetDistance(state.getCurrentViewDistance());
         if(targetViewDistance != state.getCurrentViewDistance() && !config.isViewLocked()) {
             TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(viewDistanceIndexes));
             setViewDistance(targetViewDistance);
         }
 
-        if(maxSimDistance == Integer.MAX_VALUE) {
-            maxSimDistance = config.getMaxSimDistance();
-        }
-        if(minSimDistance == 0) {
-            minSimDistance = config.getMinSimDistance();
-        }
-        if(maxSimDistance < minSimDistance) {
-            maxSimDistance = minSimDistance;
-        }
-        int targetSimDistance = MathTools.clamp(state.getCurrentSimDistance() + simStep, minSimDistance, maxSimDistance);
-
+        int targetSimDistance = simDistanceData.getTargetDistance(state.getCurrentSimDistance());
         if(targetSimDistance != state.getCurrentSimDistance() && !config.isSimLocked()) {
             TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Simulation Distance from %d to %d because of %s.", state.getCurrentSimDistance(), targetSimDistance, getRuleCauseString(simDistanceIndexes));
             setSimDistance(targetSimDistance);
         }
 
+        int updateRate = Math.min(viewDistanceData.updateRate(), simDistanceData.updateRate());
         if(updateRate == Integer.MAX_VALUE) {
             updateRate = config.getUpdateRate();
         }
-
         return updateRate;
     }
 
