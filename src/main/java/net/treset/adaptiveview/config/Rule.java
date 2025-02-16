@@ -148,8 +148,7 @@ public class Rule {
         }
 
         String[] playerArray = players.split(",");
-        List<String> playerList = Arrays.stream(playerArray).map(String::trim).toList();
-        return playerList;
+        return Arrays.stream(playerArray).map(String::trim).toList();
     }
 
     private boolean containsPlayer(ServerState serverState, String player) {
@@ -165,15 +164,15 @@ public class Rule {
     public String toConditionString() {
         StringBuilder sb = new StringBuilder();
         if(min != null && max != null) {
-            sb.append("$b").append(min).append(" <= ").append(type.toString().toLowerCase()).append(" <= ").append(max).append("$b");
+            sb.append("$b").append(min).append(" <= ").append(type.getName()).append(" <= ").append(max).append("$b");
         } else if(min != null) {
-            sb.append("$b").append(type.toString().toLowerCase()).append(" >= ").append(min).append("$b");
+            sb.append("$b").append(type.getName()).append(" >= ").append(min).append("$b");
         } else if(max != null) {
-            sb.append("$b").append(type.toString().toLowerCase()).append(" <= ").append(max).append("$b");
+            sb.append("$b").append(type.getName()).append(" <= ").append(max).append("$b");
         } else if(value != null) {
-            sb.append("$b").append(type.toString().toLowerCase()).append(" = ").append(value).append("$b");
+            sb.append("$b").append(type.getName()).append(" = ").append(value).append("$b");
         } else {
-            sb.append("$b").append(type.toString().toLowerCase()).append("$b");
+            sb.append("$b").append(type.getName()).append("$b");
         }
         return sb.toString();
     }
@@ -183,32 +182,32 @@ public class Rule {
         sb.append("$b").append(target.getName()).append("$b").append(": ");
         int len = 0;
         if(updateRate != null) {
-            sb.append("$bupdate_rate = ").append(updateRate).append("$b");
+            sb.append("$bUpdate Rate = ").append(updateRate).append("$b");
             len++;
         }
         if(step != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("$bstep = ").append(step).append("$b");
+            sb.append("$bStep = ").append(step).append("$b");
             len++;
 
             if(stepAfter != null) {
-                sb.append(", $bstep_after = ").append(stepAfter).append("$b");
+                sb.append(", $bStep After = ").append(stepAfter).append("$b");
             }
         }
         if(maxDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("$bmax_distance = ").append(maxDistance).append("$b");
+            sb.append("$bMax = ").append(maxDistance).append("$b");
             len++;
         }
         if(minDistance != null) {
             if(len > 0) {
                 sb.append(", ");
             }
-            sb.append("$bmin_distance = ").append(minDistance).append("$b");
+            sb.append("$bMin = ").append(minDistance).append("$b");
             len++;
         }
         if(len == 0) {

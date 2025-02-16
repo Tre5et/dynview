@@ -37,14 +37,14 @@ All commands are accessible using `/adaptiveview`.
 
 ### General usage
 
-- `[option_name]` allows you to view the option
-- `[option_name] [value]` sets the value of the option
-- `[option_name] clear` clears the value of the option (only available for some options)
+- `[option-name]` allows you to view the option
+- `[option-name] [value]` sets the value of the option
+- `[option-name] clear` clears the value of the option (only available for some options)
 
 ### Rules
 - `rules` shows you an index list of all options
 - `rules [index]` selects a specific rule to view and edit
-- `rules add [type] [condition_options]` adds a rule of the specific type with specified condition options (the action needs to be edited afterwards)
+- `rules add [type] [condition-options]` adds a rule of the specific type with specified condition options (the action needs to be edited afterwards)
 
 ## All commands:
 
@@ -96,19 +96,19 @@ adaptiveview
 |   config
 |   |   status
 |   |   reload
-|   |   broadcast_changes
+|   |   broadcast-changes
 |   |   |   none
 |   |   |   ops
 |   |   |   all
-|   |   broadcast_lock
+|   |   broadcast-lock
 |   |   |   none
 |   |   |   ops
 |   |   |   all
-|   |   update_rate
+|   |   update-rate
 |   |   |   [ticks: int]
-|   |   max_view_distance
+|   |   max-view-distance
 |   |   |   [chunks: int]
-|   |   min_view_distance
+|   |   min-view-distance
 |   |   |   [chunks: int]
 |   |   rules
 |   |   |   [index: int]
@@ -134,20 +134,20 @@ adaptiveview
 |   |   |   |   |   target
 |   |   |   |   |   |   view
 |   |   |   |   |   |   simulation
-|   |   |   |   |   update_rate
+|   |   |   |   |   update-rate
 |   |   |   |   |   |   [ticks: int]
 |   |   |   |   |   |   clear
-|   |   |   |   |   max_view_distance
+|   |   |   |   |   max-distance
 |   |   |   |   |   |   [chunks: int]
 |   |   |   |   |   |   clear
-|   |   |   |   |   min_view_distance
+|   |   |   |   |   min-distance
 |   |   |   |   |   |   [chunks: int]
 |   |   |   |   |   |   clear
 |   |   |   |   |   step
 |   |   |   |   |   |   [step: int]
 |   |   |   |   |   |   clear
-|   |   |   |   |   step_after
-|   |   |   |   |   |   [step_after: int]
+|   |   |   |   |   step-after
+|   |   |   |   |   |   [step-after: int]
 |   |   |   |   |   |   clear
 |   |   |   add +
 |   |   |   |   mspt +

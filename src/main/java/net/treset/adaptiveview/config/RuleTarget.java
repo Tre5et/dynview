@@ -1,8 +1,8 @@
 package net.treset.adaptiveview.config;
 
 public enum RuleTarget {
-    VIEW("view_distance"),
-    SIMULATION("simulation_distance");
+    VIEW("View Distance"),
+    SIMULATION("Simulation Distance");
 
     private final String name;
 

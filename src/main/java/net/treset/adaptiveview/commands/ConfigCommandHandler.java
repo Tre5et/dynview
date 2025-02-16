@@ -25,8 +25,9 @@ public class ConfigCommandHandler {
 
     public int list(CommandContext<ServerCommandSource> ctx) {
         TextTools.replyFormatted(ctx, "Current Configuration:");
-        TextTools.replyFormatted(ctx, "Update rate: $b%d ticks", config.getUpdateRate());
+        TextTools.replyFormatted(ctx, "Update Rate: $b%d ticks", config.getUpdateRate());
         TextTools.replyFormatted(ctx, "View Distance Range: $b%d-%d chunks", config.getMinViewDistance(), config.getMaxViewDistance());
+        TextTools.replyFormatted(ctx, "Simulation Distance Range: $b%d-%d chunks", config.getMinSimDistance(), config.getMaxSimDistance());
         TextTools.replyFormatted(ctx, "Rules: $b%s$b", config.getRules().size());
         return 1;
     }
@@ -406,7 +407,7 @@ public class ConfigCommandHandler {
 
     public int ruleSetStepAfter(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            Integer step = ctx.getArgument("step_after", Integer.class);
+            Integer step = ctx.getArgument("step-after", Integer.class);
             r.setStepAfter(step);
             config.save();
             TextTools.replyFormatted(ctx, "Set Step After of rule $b%d$b to $b%s$b", i, r.getStepAfter());
@@ -421,49 +422,49 @@ public class ConfigCommandHandler {
         });
     }
 
-    public int ruleMinView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleMinDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Min View Distance of rule $b%d$b: $b%s$b", i, r.getMinDistance());
+            TextTools.replyFormatted(ctx, "Min Distance of rule $b%d$b: $b%s$b", i, r.getMinDistance());
         });
     }
 
-    public int ruleSetMinView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleSetMinDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             Integer min = ctx.getArgument("chunks", Integer.class);
             r.setMinDistance(min);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Min View Distance of rule $b%d$b to $b%s$b", i, r.getMinDistance());
+            TextTools.replyFormatted(ctx, "Set Min Distance of rule $b%d$b to $b%s$b", i, r.getMinDistance());
         });
     }
 
-    public int ruleClearMinView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleClearMinDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             r.setMinDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Min View Distance of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Min Distance of rule $b%d$b", i);
         });
     }
 
-    public int ruleMaxView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleMaxDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
-            TextTools.replyFormatted(ctx, "Max View Distance of rule $b%d$b: $b%s$b", i, r.getMaxDistance());
+            TextTools.replyFormatted(ctx, "Max Distance of rule $b%d$b: $b%s$b", i, r.getMaxDistance());
         });
     }
 
-    public int ruleSetMaxView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleSetMaxDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             Integer max = ctx.getArgument("chunks", Integer.class);
             r.setMaxDistance(max);
             config.save();
-            TextTools.replyFormatted(ctx, "Set Max View Distance of rule $b%d$b to $b%s$b", i, r.getMaxDistance());
+            TextTools.replyFormatted(ctx, "Set Max Distance of rule $b%d$b to $b%s$b", i, r.getMaxDistance());
         });
     }
 
-    public int ruleClearMaxView(CommandContext<ServerCommandSource> ctx) {
+    public int ruleClearMaxDistance(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             r.setMaxDistance(null);
             config.save();
-            TextTools.replyFormatted(ctx, "Cleared Max View Distance of rule $b%d$b", i);
+            TextTools.replyFormatted(ctx, "Cleared Max Distance of rule $b%d$b", i);
         });
     }
 
@@ -603,37 +604,37 @@ public class ConfigCommandHandler {
                 .then(CommandManager.literal("reload")
                         .executes(this::reload)
                 )
-                .then(CommandManager.literal("update_rate")
+                .then(CommandManager.literal("update-rate")
                         .executes(this::updateRate)
                         .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1, 72000))
                                 .executes(this::setUpdateRate)
                         )
                 )
-                .then(CommandManager.literal("max_view_distance")
+                .then(CommandManager.literal("max-view-distance")
                         .executes(this::maxView)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMaxView)
                         )
                 )
-                .then(CommandManager.literal("min_view_distance")
+                .then(CommandManager.literal("min-view-distance")
                         .executes(this::minView)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMinView)
                         )
                 )
-                .then(CommandManager.literal("max_simulation_distance")
+                .then(CommandManager.literal("max-simulation-distance")
                         .executes(this::maxSim)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMaxSim)
                         )
                 )
-                .then(CommandManager.literal("min_simulation_distance")
+                .then(CommandManager.literal("min-simulation-distance")
                         .executes(this::minSim)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMinSim)
                         )
                 )
-                .then(CommandManager.literal("broadcast_changes")
+                .then(CommandManager.literal("broadcast-changes")
                         .executes(this::broadcastChanges)
                         .then(CommandManager.literal("none")
                                 .executes(this::broadcastChangesNone)
@@ -645,7 +646,7 @@ public class ConfigCommandHandler {
                                 .executes(this::broadcastChangesAll)
                         )
                 )
-                .then(CommandManager.literal("broadcast_lock")
+                .then(CommandManager.literal("broadcast-lock")
                         .executes(this::broadcastLock)
                         .then(CommandManager.literal("none")
                                 .executes(this::broadcastLockNone)
@@ -726,7 +727,7 @@ public class ConfigCommandHandler {
                                                         .executes(this::ruleSetTargetSim)
                                                 )
                                         )
-                                        .then(CommandManager.literal("update_rate")
+                                        .then(CommandManager.literal("update-rate")
                                                 .executes(this::ruleUpdateRate)
                                                 .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1, 72000))
                                                         .executes(this::ruleSetUpdateRate)
@@ -744,31 +745,31 @@ public class ConfigCommandHandler {
                                                         .executes(this::ruleClearStep)
                                                 )
                                         )
-                                        .then(CommandManager.literal("step_after")
+                                        .then(CommandManager.literal("step-after")
                                                 .executes(this::ruleStepAfter)
-                                                .then(CommandManager.argument("step_after", IntegerArgumentType.integer(1, 100))
+                                                .then(CommandManager.argument("step-after", IntegerArgumentType.integer(1, 100))
                                                         .executes(this::ruleSetStepAfter)
                                                 )
                                                 .then(CommandManager.literal("clear")
                                                         .executes(this::ruleClearStepAfter)
                                                 )
                                         )
-                                        .then(CommandManager.literal("min_view_distance")
-                                                .executes(this::ruleMinView)
+                                        .then(CommandManager.literal("min-distance")
+                                                .executes(this::ruleMinDistance)
                                                 .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
-                                                        .executes(this::ruleSetMinView)
+                                                        .executes(this::ruleSetMinDistance)
                                                 )
                                                 .then(CommandManager.literal("clear")
-                                                        .executes(this::ruleClearMinView)
+                                                        .executes(this::ruleClearMinDistance)
                                                 )
                                         )
-                                        .then(CommandManager.literal("max_view_distance")
-                                                .executes(this::ruleMaxView)
+                                        .then(CommandManager.literal("max-distance")
+                                                .executes(this::ruleMaxDistance)
                                                 .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
-                                                        .executes(this::ruleSetMaxView)
+                                                        .executes(this::ruleSetMaxDistance)
                                                 )
                                                 .then(CommandManager.literal("clear")
-                                                        .executes(this::ruleClearMaxView)
+                                                        .executes(this::ruleClearMaxDistance)
                                                 )
                                         )
                                 )
