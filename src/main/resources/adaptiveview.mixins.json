@@ -4,7 +4,8 @@
   "package": "net.treset.adaptiveview.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "ServerChunkLoadingManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
