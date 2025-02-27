@@ -4,6 +4,8 @@
   "min_view_distance": 4,
   "max_sim_distance": 20,
   "min_sim_distance": 4,
+  "max_chunk_ticking_distance": 8,
+  "min_chunk_ticking_distance": 8,
   "allow_on_client": false,
   "broadcast_changes_default": "NONE",
   "broadcast_changes": [],

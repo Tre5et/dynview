@@ -26,6 +26,7 @@ All commands are accessible using `/adaptiveview`.
 
 `/adaptiveview unlock` allows you to unlock the View and Simulation Distance.
 
+- `all` clears all locks, that don't have a condition for automatic unlocking
 - `main` clears all View Distance and Simulation Distance locks, that don't have a condition for automatic unlocking
 - `view` clears all View Distance locks, that don't have a condition for automatic unlocking
 - `simulation` clears all Simulation Distance locks, that don't have a condition for automatic unlocking
@@ -97,6 +98,8 @@ adaptiveview
 |   |   |   |   |   |   disconnect
 |   |   |   |   |   |   move
 |   unlock
+|   |   all
+|   |   |   clear
 |   |   main
 |   |   |   clear
 |   |   view

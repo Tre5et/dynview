@@ -204,7 +204,7 @@ public class Config {
             oldConfig.getMaxViewDistance(),
             oldConfig.getMinViewDistance(),
             8,
-            2,
+            8,
             oldConfig.isOverrideClient(),
             BroadcastLevel.NONE,
             new ArrayList<>(),
@@ -370,7 +370,7 @@ public class Config {
 
     public int getMinChunkTickingDistance() {
         if(minChunkTickingDistance <= 0) {
-            setMinChunkTickingDistance(2);
+            setMinChunkTickingDistance(8);
             save();
         }
         return minChunkTickingDistance;

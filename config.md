@@ -13,6 +13,8 @@ These values apply if there are no rules active that override them.
 - `min_view_distance`: The minimum view distance the dynamic adjustment can go down to.
 - `max_sim_distance`: The maximum simulation distance the dynamic adjustment can go up to.
 - `min_sim_distance`: The minimum simulation distance the dynamic adjustment can go down to.
+- `max_chunk_ticking_distance`: The maximum chunk-ticking distance the dynamic adjustment can go up to.
+- `min_chunk_ticking_distance`: The minimum chunk-ticking distance the dynamic adjustment can go down to.
 
 ### Other Configurations
 - `allow_on_client`: If this is enabled the mod will try to work in a client only environment. This can lead to unexpected behaviour.
@@ -41,14 +43,18 @@ All the following need to be met for the rule to be active:
   - `\`: None of the specified players are online
 
 ### Action
-- `target`: One of `VIEW` or `SIMULATION`. Whether view- or simulation-distance is affected.
+- `target`: One of `VIEW`, `SIMULATION` or `CHUNK_TICKING`. Whether view-, simulation- or chunk-ticking distance is affected.
+
+> [!WARNING]
+> Due to the way Minecraft handles chunk tracking, blocks outside of an 17x17 chunk area around the player will not receive chunk ticks, no matter what the `CHUNK_TICKING` rules set. 
+> This probably cannot be changed without rewriting large parts of chunk loading code.
 
 If the condition is met, the following actions are performed:
 
 - `update_rate`: Overrides the global `update_rate` value.
-- `max_distance`: Overrides the global `max_view_distance` or `max_sim_distance` value depending on `target`.
-- `min_distance`: Overrides the global `min_distance` or `max_sim_distance` value depending on `target`.
-- `step`: The amount of chunks the view- or simulation-distance is changed by every update. Positive values increase the  distance and negative values decrease it. 
+- `max_distance`: Overrides the global `max_view_distance`, `max_sim_distance` or `max_chunk_ticking_distance` value depending on `target`.
+- `min_distance`: Overrides the global `minv_iew_distance`, `min_sim_distance` or `min_chunk_ticking_distance` value depending on `target`.
+- `step`: The amount of chunks the target is changed by every update. Positive values increase the  distance and negative values decrease it. 
 - `step_after`: The amount of update after which the step is performed. E.g. if `update_rate` is `100` and `step_after` is `2`, the `step` will be performed every `200` ticks.
 
 ### Resolving conflicts
@@ -118,7 +124,8 @@ A basic config applicable to most servers struggling for MSPT performance.
 
 A config that could be used, if a server is low on memory.
 
-> **Note**: Updating view distance based on memory too quickly can be problematic, as it can take a while for memory usage to change after decreasing view distance.
+> [!NOTE] 
+> Updating view distance based on memory too quickly can be problematic, as it can take a while for memory usage to change after decreasing view distance.
 
 1. The View Distance is updated every 1200 ticks (1 mínute),
 2. If there is at most one player online, the View Distance is at most 28 chunks.
@@ -220,6 +227,8 @@ Option names followed by a `?` denote optional options.
   "min_view_distance": int[2..32],
   "max_sim_distance": int[2..32],
   "min_sim_distance": int[2..32],
+  "max_chunk_ticking_distance": int[2..32],
+  "min_chunk_ticking_distance": int[2..32],
   "allow_on_clinet": boolean,
   "broadcast_changes_default": string[NONE/OPS/ALL],
   "broadcast_changes": [
@@ -235,7 +244,7 @@ Option names followed by a `?` denote optional options.
       "value?": string,
       "max?": int[0..],
       "max?": int[0..],
-      "target": string[VIEW/SIMULATION],
+      "target": string[VIEW/SIMULATION/CHUNK_TICKING],
       "update_rate?": int[1..],
       "max_distance?": int[2..32],
       "min_distance?": int[2..32],

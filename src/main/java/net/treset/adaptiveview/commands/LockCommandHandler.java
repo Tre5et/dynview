@@ -229,10 +229,24 @@ public class LockCommandHandler {
     }
 
     public int unlockAll(CommandContext<ServerCommandSource> ctx) {
-        return unlock(ctx, LockTarget.MAIN);
+        if(unlock(ctx, LockTarget.VIEW) == 1 && unlock(ctx, LockTarget.SIM) == 1 && unlock(ctx, LockTarget.CHUNK) == 1) {
+            return 1;
+        }
+        return 0;
     }
 
     public int unlockAllClear(CommandContext<ServerCommandSource> ctx) {
+        if(unlockClear(ctx, LockTarget.VIEW) == 1 && unlockClear(ctx, LockTarget.SIM) == 1 && unlockClear(ctx, LockTarget.CHUNK) == 1) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public int unlockMain(CommandContext<ServerCommandSource> ctx) {
+        return unlock(ctx, LockTarget.MAIN);
+    }
+
+    public int unlockMainClear(CommandContext<ServerCommandSource> ctx) {
         return unlockClear(ctx, LockTarget.MAIN);
     }
 
@@ -353,11 +367,17 @@ public class LockCommandHandler {
         )
         .then(CommandManager.literal("unlock")
                 .requires(source -> source.hasPermissionLevel(2))
-                .executes(this::unlockAll)
-                .then(CommandManager.literal("main")
+                .executes(this::status)
+                .then(CommandManager.literal("all")
                         .executes(this::unlockAll)
                         .then(CommandManager.literal("clear")
                                 .executes(this::unlockAllClear)
+                        )
+                )
+                .then(CommandManager.literal("main")
+                        .executes(this::unlockMain)
+                        .then(CommandManager.literal("clear")
+                                .executes(this::unlockMainClear)
                         )
                 )
                 .then(CommandManager.literal("view")
