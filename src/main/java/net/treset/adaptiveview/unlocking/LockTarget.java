@@ -1,9 +1,10 @@
 package net.treset.adaptiveview.unlocking;
 
 public enum LockTarget {
-    ALL("View and Simulation Distance", "are"),
+    MAIN("View and Simulation Distance", "are"),
     VIEW("View Distance", "is"),
-    SIM("Simulation Distance", "is");
+    SIM("Simulation Distance", "is"),
+    CHUNK("Chunk-Ticking Distance", "is");
 
     private final String prettyString;
     private final String is;

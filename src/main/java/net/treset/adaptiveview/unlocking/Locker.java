@@ -19,7 +19,7 @@ public abstract class Locker {
         beforeTick();
         if(shouldUnlock()) {
             lockManager.finishLocker(this);
-            TextTools.broadcastIf((p) -> LockManager.shouldBroadcastLock(p, lockManager.getConfig()), "Cleared View distance lock of $b%s chunks$b after %s", distance, getUnlockReason());
+            TextTools.broadcastIf((p) -> LockManager.shouldBroadcastLock(p, lockManager.getConfig()), "Cleared %s lock of $b%s chunks$b after %s", getTarget().getPrettyString(), distance, getUnlockReason());
         }
     }
 

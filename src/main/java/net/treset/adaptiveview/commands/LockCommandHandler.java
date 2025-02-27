@@ -54,7 +54,7 @@ public class LockCommandHandler {
     }
 
     private int status(CommandContext<ServerCommandSource> ctx) {
-        if(lockStatus(ctx, LockTarget.VIEW) == 1 && lockStatus(ctx, LockTarget.SIM) == 1) {
+        if(lockStatus(ctx, LockTarget.VIEW) == 1 && lockStatus(ctx, LockTarget.SIM) == 1 && lockStatus(ctx, LockTarget.CHUNK) == 1) {
             return 1;
         }
         return 0;
@@ -165,19 +165,19 @@ public class LockCommandHandler {
     }
 
     public int allChunks(CommandContext<ServerCommandSource> ctx) {
-        return lock(ctx, LockTarget.ALL);
+        return lock(ctx, LockTarget.MAIN);
     }
 
     public int allChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
-        return lockTimeout(ctx, LockTarget.ALL);
+        return lockTimeout(ctx, LockTarget.MAIN);
     }
 
     public int allChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
-        return lockPlayerDisconnect(ctx, LockTarget.ALL);
+        return lockPlayerDisconnect(ctx, LockTarget.MAIN);
     }
 
     public int allChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
-        return lockPlayerMove(ctx, LockTarget.ALL);
+        return lockPlayerMove(ctx, LockTarget.MAIN);
     }
 
     public int viewChunks(CommandContext<ServerCommandSource> ctx) {
@@ -212,12 +212,28 @@ public class LockCommandHandler {
         return lockPlayerMove(ctx, LockTarget.SIM);
     }
 
+    public int chunkTickChunks(CommandContext<ServerCommandSource> ctx) {
+        return lock(ctx, LockTarget.CHUNK);
+    }
+
+    public int chunkTickChunksTimeoutTicks(CommandContext<ServerCommandSource> ctx) {
+        return lockTimeout(ctx, LockTarget.CHUNK);
+    }
+
+    public int chunkTickChunksPlayerDisconnect(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerDisconnect(ctx, LockTarget.CHUNK);
+    }
+
+    public int chunkTickChunksPlayerMove(CommandContext<ServerCommandSource> ctx) {
+        return lockPlayerMove(ctx, LockTarget.CHUNK);
+    }
+
     public int unlockAll(CommandContext<ServerCommandSource> ctx) {
-        return unlock(ctx, LockTarget.ALL);
+        return unlock(ctx, LockTarget.MAIN);
     }
 
     public int unlockAllClear(CommandContext<ServerCommandSource> ctx) {
-        return unlockClear(ctx, LockTarget.ALL);
+        return unlockClear(ctx, LockTarget.MAIN);
     }
 
     public int unlockView(CommandContext<ServerCommandSource> ctx) {
@@ -236,13 +252,21 @@ public class LockCommandHandler {
         return unlockClear(ctx, LockTarget.SIM);
     }
 
+    public int unlockChunkTick(CommandContext<ServerCommandSource> ctx) {
+        return unlock(ctx, LockTarget.CHUNK);
+    }
+
+    public int unlockChunkTickClear(CommandContext<ServerCommandSource> ctx) {
+        return unlockClear(ctx, LockTarget.CHUNK);
+    }
+
     public void registerCommands(LiteralArgumentBuilder<ServerCommandSource> builder) {
         builder.then(CommandManager.literal("lock")
                 .executes(this::status)
                 .then(CommandManager.literal("status")
                         .executes(this::status)
                 )
-                .then(CommandManager.literal("all")
+                .then(CommandManager.literal("main")
                         .requires(source -> source.hasPermissionLevel(2))
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::allChunks)
@@ -305,11 +329,32 @@ public class LockCommandHandler {
                                 )
                         )
                 )
+                .then(CommandManager.literal("chunk-tick")
+                        .requires(source -> source.hasPermissionLevel(2))
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::chunkTickChunks)
+                                .then(CommandManager.literal("timeout")
+                                        .then(CommandManager.argument("ticks", IntegerArgumentType.integer(1))
+                                                .executes(this::chunkTickChunksTimeoutTicks)
+                                        )
+                                )
+                                .then(CommandManager.literal("player")
+                                        .then(CommandManager.argument("player", EntityArgumentType.player())
+                                                .then(CommandManager.literal("disconnect")
+                                                        .executes(this::chunkTickChunksPlayerDisconnect)
+                                                )
+                                                .then(CommandManager.literal("move")
+                                                        .executes(this::chunkTickChunksPlayerMove)
+                                                )
+                                        )
+                                )
+                        )
+                )
         )
         .then(CommandManager.literal("unlock")
                 .requires(source -> source.hasPermissionLevel(2))
                 .executes(this::unlockAll)
-                .then(CommandManager.literal("all")
+                .then(CommandManager.literal("main")
                         .executes(this::unlockAll)
                         .then(CommandManager.literal("clear")
                                 .executes(this::unlockAllClear)
@@ -325,6 +370,12 @@ public class LockCommandHandler {
                         .executes(this::unlockSim)
                         .then(CommandManager.literal("clear")
                                 .executes(this::unlockSimClear)
+                        )
+                )
+                .then(CommandManager.literal("chunk-tick")
+                        .executes(this::unlockChunkTick)
+                        .then(CommandManager.literal("clear")
+                                .executes(this::unlockChunkTickClear)
                         )
                 )
         );

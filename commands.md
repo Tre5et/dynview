@@ -10,7 +10,7 @@ All commands are accessible using `/adaptiveview`.
 
 `/adaptiveview lock` allows you to check if the View or Simulation Distance is currently locked and allows to lock it.
 
-- `all [chunks] {[condition]}` locks the View Distance and Simulation Distance to `chunks`.
+- `main [chunks] {[condition]}` locks the View Distance and Simulation Distance to `chunks`.
 - `view [chunks] {[condition]}` locks the View Distance to `chunks`.
 - `simulation [chunks] {[condition]}` locks the Simulation Distance to `chunks`.
 - `chunk-tick [chunks] {[condition]}` locks the Chunk-Ticking Distance to `chunks`.
@@ -26,7 +26,7 @@ All commands are accessible using `/adaptiveview`.
 
 `/adaptiveview unlock` allows you to unlock the View and Simulation Distance.
 
-- `all` clears all lock, that don't have a condition for automatic unlocking
+- `main` clears all View Distance and Simulation Distance locks, that don't have a condition for automatic unlocking
 - `view` clears all View Distance locks, that don't have a condition for automatic unlocking
 - `simulation` clears all Simulation Distance locks, that don't have a condition for automatic unlocking
 - `chunk-tick` clears all Chunk-Ticking Distance locks, that don't have a condition for automatic unlocking
@@ -64,7 +64,7 @@ adaptiveview
 |   |   |   unsubscribe
 |   lock
 |   |   status
-|   |   all +
+|   |   main +
 |   |   |   [chunks: int]
 |   |   |   |   timeout +
 |   |   |   |   |   [ticks: int]
@@ -97,7 +97,7 @@ adaptiveview
 |   |   |   |   |   |   disconnect
 |   |   |   |   |   |   move
 |   unlock
-|   |   all
+|   |   main
 |   |   |   clear
 |   |   view
 |   |   |   clear

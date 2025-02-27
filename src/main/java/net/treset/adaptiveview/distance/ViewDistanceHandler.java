@@ -66,7 +66,7 @@ public class ViewDistanceHandler {
 
         int targetChunkTicking = chunkTickingData.getTargetDistance(state.currentChunkTickingDistance());
         if(targetChunkTicking != state.currentChunkTickingDistance() && !config.isChunkTickingLocked()) {
-            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Chunk Ticking Distance from %d to %d because of %s.", state.currentChunkTickingDistance(), targetChunkTicking, getRuleCauseString(chunkTickingIndexes));
+            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Chunk-Ticking Distance from %d to %d because of %s.", state.currentChunkTickingDistance(), targetChunkTicking, getRuleCauseString(chunkTickingIndexes));
             setChunkTickingDistance(targetChunkTicking);
         }
 
@@ -109,11 +109,11 @@ public class ViewDistanceHandler {
         return sb.toString();
     }
 
-    public void setViewDistance(int chunks) {
+    public static void setViewDistance(int chunks) {
         AdaptiveViewMod.getServer().getPlayerManager().setViewDistance(chunks);
     }
 
-    public void setSimDistance(int chunks) {
+    public static void setSimDistance(int chunks) {
         AdaptiveViewMod.getServer().getPlayerManager().setSimulationDistance(chunks);
     }
 
