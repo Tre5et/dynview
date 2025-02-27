@@ -44,6 +44,7 @@ public class ServerHandler {
             ServerState state = new ServerState(
                     ViewDistanceHandler.getViewDistance(),
                     ViewDistanceHandler.getSimDistance(),
+                    ViewDistanceHandler.getChunkTickingDistance(),
                     (double)MathTools.longArrayAverage(tickLengths.toArray(new Long[0])) / 1000000d,
                     getMemory(),
                     getPlayers()

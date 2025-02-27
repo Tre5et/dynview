@@ -99,12 +99,12 @@ public class Rule {
         if(!valid) return false;
         switch (type) {
             case MSPT -> {
-                if(valueInMinMax(serverState.getMspt())) {
+                if(valueInMinMax(serverState.mspt())) {
                     return true;
                 }
             }
             case MEMORY -> {
-                if(valueInMinMax(serverState.getMemory())) {
+                if(valueInMinMax(serverState.memory())) {
                     return true;
                 }
             }
@@ -118,7 +118,7 @@ public class Rule {
                             return true;
                         }
                     } else if(value.startsWith("!")) {
-                        if(serverState.getPlayers().stream().anyMatch((p) -> !TextTools.containsIgnoreCase(players, p))) {
+                        if(serverState.players().stream().anyMatch((p) -> !TextTools.containsIgnoreCase(players, p))) {
                             // Any not specified player is online
                             return true;
                         }
@@ -133,7 +133,7 @@ public class Rule {
                             return true;
                         }
                     }
-                } else if(valueInMinMax(serverState.getPlayers().size())) {
+                } else if(valueInMinMax(serverState.players().size())) {
                     return true;
                 }
             }
@@ -152,7 +152,7 @@ public class Rule {
     }
 
     private boolean containsPlayer(ServerState serverState, String player) {
-        return TextTools.containsIgnoreCase(serverState.getPlayers(), player);
+        return TextTools.containsIgnoreCase(serverState.players(), player);
     }
 
     private boolean valueInMinMax(double value) {

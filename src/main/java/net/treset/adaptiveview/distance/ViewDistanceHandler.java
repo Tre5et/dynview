@@ -4,13 +4,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.treset.adaptiveview.AdaptiveViewMod;
 import net.treset.adaptiveview.config.Config;
 import net.treset.adaptiveview.config.Rule;
-import net.treset.adaptiveview.config.RuleTarget;
 import net.treset.adaptiveview.config.ServerState;
 import net.treset.adaptiveview.tools.NotificationState;
 import net.treset.adaptiveview.tools.TextTools;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class ViewDistanceHandler {
 
@@ -25,36 +25,52 @@ public class ViewDistanceHandler {
         ArrayList<Integer> viewDistanceIndexes = new ArrayList<>();
         ArrayList<Rule> simDistanceRules = new ArrayList<>();
         ArrayList<Integer> simDistanceIndexes = new ArrayList<>();
+        ArrayList<Rule> chunkTickingRules = new ArrayList<>();
+        ArrayList<Integer> chunkTickingIndexes = new ArrayList<>();
 
         for(int i = 0; i < config.getRules().size(); i++) {
             Rule rule = config.getRules().get(i);
             if(rule.applies(state)) {
-                if(rule.getTarget() == RuleTarget.SIMULATION) {
-                    simDistanceRules.add(rule);
-                    simDistanceIndexes.add(i + 1);
-                } else {
-                    viewDistanceRules.add(rule);
-                    viewDistanceIndexes.add(i + 1);
+                switch (rule.getTarget()) {
+                    case VIEW -> {
+                        viewDistanceRules.add(rule);
+                        viewDistanceIndexes.add(i + 1);
+                    }
+                    case SIMULATION -> {
+                        simDistanceRules.add(rule);
+                        simDistanceIndexes.add(i + 1);
+                    }
+                    case CHUNK_TICKING -> {
+                        chunkTickingRules.add(rule);
+                        chunkTickingIndexes.add(i + 1);
+                    }
                 }
             }
         }
 
         DistanceData viewDistanceData = DistanceData.extract(viewDistanceRules, config.getMaxViewDistance(), config.getMinViewDistance());
         DistanceData simDistanceData = DistanceData.extract(simDistanceRules, config.getMaxSimDistance(), config.getMinSimDistance());
+        DistanceData chunkTickingData = DistanceData.extract(chunkTickingRules, config.getMaxChunkTickingDistance(), config.getMinChunkTickingDistance());
 
-        int targetViewDistance = viewDistanceData.getTargetDistance(state.getCurrentViewDistance());
-        if(targetViewDistance != state.getCurrentViewDistance() && !config.isViewLocked()) {
-            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed View Distance from %d to %d because of %s.", state.getCurrentViewDistance(), targetViewDistance, getRuleCauseString(viewDistanceIndexes));
+        int targetViewDistance = viewDistanceData.getTargetDistance(state.currentViewDistance());
+        if(targetViewDistance != state.currentViewDistance() && !config.isViewLocked()) {
+            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed View Distance from %d to %d because of %s.", state.currentViewDistance(), targetViewDistance, getRuleCauseString(viewDistanceIndexes));
             setViewDistance(targetViewDistance);
         }
 
-        int targetSimDistance = simDistanceData.getTargetDistance(state.getCurrentSimDistance());
-        if(targetSimDistance != state.getCurrentSimDistance() && !config.isSimLocked()) {
-            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Simulation Distance from %d to %d because of %s.", state.getCurrentSimDistance(), targetSimDistance, getRuleCauseString(simDistanceIndexes));
+        int targetSimDistance = simDistanceData.getTargetDistance(state.currentSimDistance());
+        if(targetSimDistance != state.currentSimDistance() && !config.isSimLocked()) {
+            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Simulation Distance from %d to %d because of %s.", state.currentSimDistance(), targetSimDistance, getRuleCauseString(simDistanceIndexes));
             setSimDistance(targetSimDistance);
         }
 
-        int updateRate = Math.min(viewDistanceData.updateRate(), simDistanceData.updateRate());
+        int targetChunkTicking = chunkTickingData.getTargetDistance(state.currentChunkTickingDistance());
+        if(targetChunkTicking != state.currentChunkTickingDistance() && !config.isChunkTickingLocked()) {
+            TextTools.broadcastIf((p) -> shouldBroadcastChange(p, config), "Changed Chunk Ticking Distance from %d to %d because of %s.", state.currentChunkTickingDistance(), targetChunkTicking, getRuleCauseString(chunkTickingIndexes));
+            setChunkTickingDistance(targetChunkTicking);
+        }
+
+        int updateRate = IntStream.of(viewDistanceData.updateRate(), simDistanceData.updateRate(), chunkTickingData.updateRate()).min().getAsInt();
         if(updateRate == Integer.MAX_VALUE) {
             updateRate = config.getUpdateRate();
         }
@@ -107,6 +123,16 @@ public class ViewDistanceHandler {
 
     public static int getSimDistance() {
         return AdaptiveViewMod.getServer().getPlayerManager().getSimulationDistance();
+    }
+
+    private static int chunkTickingDistance = 8;
+
+    public static int getChunkTickingDistance() {
+        return chunkTickingDistance;
+    }
+
+    public static void setChunkTickingDistance(int chunks) {
+        chunkTickingDistance = chunks;
     }
 
     public static boolean shouldBroadcastChange(ServerPlayerEntity player, Config config) {NotificationState state = NotificationState.getFromPlayer(player, config.getBroadcastChanges());

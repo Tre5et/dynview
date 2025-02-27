@@ -24,6 +24,8 @@ public class Config {
     private int minViewDistance;
     private int maxSimDistance;
     private int minSimDistance;
+    private int maxChunkTickingDistance;
+    private int minChunkTickingDistance;
     private boolean allowOnClient;
     @SerializedName("broadcast_to_ops")
     @Expose(serialize = false)
@@ -37,13 +39,16 @@ public class Config {
 
     private transient boolean viewLocked = false;
     private transient boolean simLocked = false;
+    private transient boolean chunkTickingLocked = false;
 
-    public Config(int updateRate, int maxViewDistance, int minViewDistance, int maxSimDistance, int minSimDistance, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
+    public Config(int updateRate, int maxViewDistance, int minViewDistance, int maxSimDistance, int minSimDistance, int maxChunkTickingDistance, int minChunkTicking, boolean allowOnClient, BroadcastLevel broadcastChangesDefault, ArrayList<String> broadcastChanges, BroadcastLevel broadcastLockDefault, ArrayList<String> broadcastLock, ArrayList<Rule> rules) {
         this.updateRate = updateRate;
         this.maxViewDistance = maxViewDistance;
         this.minViewDistance = minViewDistance;
         this.maxSimDistance = maxSimDistance;
         this.minSimDistance = minSimDistance;
+        this.maxChunkTickingDistance = maxChunkTickingDistance;
+        this.minChunkTickingDistance = minChunkTicking;
         this.allowOnClient = allowOnClient;
         this.rules = rules;
         this.broadcastChangesDefault = broadcastChangesDefault;
@@ -59,6 +64,8 @@ public class Config {
             4,
             20,
             4,
+            8,
+            2,
             false,
             BroadcastLevel.NONE,
             new ArrayList<>(),
@@ -196,6 +203,8 @@ public class Config {
             oldConfig.getMinViewDistance(),
             oldConfig.getMaxViewDistance(),
             oldConfig.getMinViewDistance(),
+            8,
+            2,
             oldConfig.isOverrideClient(),
             BroadcastLevel.NONE,
             new ArrayList<>(),
@@ -270,6 +279,8 @@ public class Config {
         this.minViewDistance = config.minViewDistance;
         this.maxSimDistance = config.maxSimDistance;
         this.minSimDistance = config.minSimDistance;
+        this.maxChunkTickingDistance = config.maxChunkTickingDistance;
+        this.minChunkTickingDistance = config.minChunkTickingDistance;
         this.allowOnClient = config.allowOnClient;
         this.broadcastChangesDefault = config.broadcastChangesDefault;
         this.broadcastChanges = config.broadcastChanges;
@@ -345,6 +356,30 @@ public class Config {
         this.minSimDistance = minSimDistance;
     }
 
+    public int getMaxChunkTickingDistance() {
+        if(maxChunkTickingDistance <= 0) {
+            setMaxChunkTickingDistance(8);
+            save();
+        }
+        return maxChunkTickingDistance;
+    }
+
+    public void setMaxChunkTickingDistance(int maxChunkTickingDistance) {
+        this.maxChunkTickingDistance = maxChunkTickingDistance;
+    }
+
+    public int getMinChunkTickingDistance() {
+        if(minChunkTickingDistance <= 0) {
+            setMinChunkTickingDistance(2);
+            save();
+        }
+        return minChunkTickingDistance;
+    }
+
+    public void setMinChunkTickingDistance(int minChunkTickingDistance) {
+        this.minChunkTickingDistance = minChunkTickingDistance;
+    }
+
     public boolean isAllowOnClient() {
         return allowOnClient;
     }
@@ -407,6 +442,14 @@ public class Config {
 
     public void setSimLocked(boolean simLocked) {
         this.simLocked = simLocked;
+    }
+
+    public boolean isChunkTickingLocked() {
+        return chunkTickingLocked;
+    }
+
+    public void setChunkTickingLocked(boolean chunkTickingLocked) {
+        this.chunkTickingLocked = chunkTickingLocked;
     }
 
     @Deprecated
