@@ -76,6 +76,7 @@ public class AdaptiveViewMod implements ModInitializer {
 	private int status(CommandContext<ServerCommandSource> ctx) {
 		TextTools.replyFormatted(ctx, "View Distance: $b%s chunks", ViewDistanceHandler.getViewDistance());
 		TextTools.replyFormatted(ctx, "Simulation Distance: $b%s chunks", ViewDistanceHandler.getSimDistance());
+        TextTools.replyFormatted(ctx, "Chunk-Ticking Distance: $b%s chunks", ViewDistanceHandler.getChunkTickingDistance());
 		return 1;
 	}
 }

@@ -28,6 +28,7 @@ public class ConfigCommandHandler {
         TextTools.replyFormatted(ctx, "Update Rate: $b%d ticks", config.getUpdateRate());
         TextTools.replyFormatted(ctx, "View Distance Range: $b%d-%d chunks", config.getMinViewDistance(), config.getMaxViewDistance());
         TextTools.replyFormatted(ctx, "Simulation Distance Range: $b%d-%d chunks", config.getMinSimDistance(), config.getMaxSimDistance());
+        TextTools.replyFormatted(ctx, "Chunk-Ticking Distance Range: $b%d-%d chunks", config.getMinChunkTickingDistance(), config.getMaxChunkTickingDistance());
         TextTools.replyFormatted(ctx, "Rules: $b%s$b", config.getRules().size());
         return 1;
     }
@@ -108,6 +109,32 @@ public class ConfigCommandHandler {
         config.setMinSimDistance(chunks);
         config.save();
         TextTools.replyFormatted(ctx, "Set Min Simulation Distance to $b%s chunks", config.getMinSimDistance());
+        return 1;
+    }
+
+    public int maxChunkTicking(CommandContext<ServerCommandSource> ctx) {
+        TextTools.replyFormatted(ctx, "Max Chunk-Ticking Distance: $b%s chunks", config.getMaxChunkTickingDistance());
+        return 1;
+    }
+
+    public int setMaxChunkTicking(CommandContext<ServerCommandSource> ctx) {
+        Integer chunks = ctx.getArgument("chunks", Integer.class);
+        config.setMaxChunkTickingDistance(chunks);
+        config.save();
+        TextTools.replyFormatted(ctx, "Set Max Chunk-Ticking Distance to $b%s chunks", config.getMaxChunkTickingDistance());
+        return 1;
+    }
+
+    public int minChunkTicking(CommandContext<ServerCommandSource> ctx) {
+        TextTools.replyFormatted(ctx, "Min Chunk-Ticking Distance: $b%s chunks", config.getMinChunkTickingDistance());
+        return 1;
+    }
+
+    public int setMinChunkTicking(CommandContext<ServerCommandSource> ctx) {
+        Integer chunks = ctx.getArgument("chunks", Integer.class);
+        config.setMinChunkTickingDistance(chunks);
+        config.save();
+        TextTools.replyFormatted(ctx, "Set Min Chunk-Ticking Distance to $b%s chunks", config.getMinChunkTickingDistance());
         return 1;
     }
 
@@ -353,6 +380,10 @@ public class ConfigCommandHandler {
         return ruleSetTarget(ctx, RuleTarget.SIMULATION);
     }
 
+    public int ruleSetTargetChunkTick(CommandContext<ServerCommandSource> ctx) {
+        return ruleSetTarget(ctx, RuleTarget.CHUNK_TICKING);
+    }
+
     public int ruleUpdateRate(CommandContext<ServerCommandSource> ctx) {
         return performRuleAction(ctx, (i, r) -> {
             TextTools.replyFormatted(ctx, "Update Rate of rule $b%d$b: $b%s$b", i, r.getUpdateRate());
@@ -494,8 +525,13 @@ public class ConfigCommandHandler {
     }
 
     public int addMsptMinSim(CommandContext<ServerCommandSource> ctx) {
-        Integer max = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.SIMULATION);
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, null, min, RuleTarget.SIMULATION);
+    }
+
+    public int addMsptMinChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, null, min, RuleTarget.CHUNK_TICKING);
     }
 
     public int addMsptMaxView(CommandContext<ServerCommandSource> ctx) {
@@ -506,6 +542,11 @@ public class ConfigCommandHandler {
     public int addMsptMaxSim(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
         return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addMsptMaxChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, max, null, RuleTarget.CHUNK_TICKING);
     }
 
     public int addMsptRangeView(CommandContext<ServerCommandSource> ctx) {
@@ -520,14 +561,25 @@ public class ConfigCommandHandler {
         return addRule(ctx, RuleType.MSPT, null, max, min, RuleTarget.SIMULATION);
     }
 
+    public int addMsptRangeChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MSPT, null, max, min, RuleTarget.CHUNK_TICKING);
+    }
+
     public int addMemoryMinView(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         return addRule(ctx, RuleType.MEMORY, null, null, min, RuleTarget.VIEW);
     }
 
     public int addMemoryMinSim(CommandContext<ServerCommandSource> ctx) {
-        Integer max = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.SIMULATION);
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, null, min, RuleTarget.SIMULATION);
+    }
+
+    public int addMemoryMinChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, null, min, RuleTarget.CHUNK_TICKING);
     }
 
     public int addMemoryMaxView(CommandContext<ServerCommandSource> ctx) {
@@ -538,6 +590,11 @@ public class ConfigCommandHandler {
     public int addMemoryMaxSim(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
         return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addMemoryMaxChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, null, RuleTarget.CHUNK_TICKING);
     }
 
     public int addMemoryRangeView(CommandContext<ServerCommandSource> ctx) {
@@ -552,14 +609,25 @@ public class ConfigCommandHandler {
         return addRule(ctx, RuleType.MEMORY, null, max, min, RuleTarget.SIMULATION);
     }
 
+    public int addMemoryRangeChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.MEMORY, null, max, min, RuleTarget.CHUNK_TICKING);
+    }
+
     public int addPlayersMinView(CommandContext<ServerCommandSource> ctx) {
         Integer min = ctx.getArgument("min", Integer.class);
         return addRule(ctx, RuleType.PLAYERS, null, null, min, RuleTarget.VIEW);
     }
 
     public int addPlayersMinSim(CommandContext<ServerCommandSource> ctx) {
-        Integer max = ctx.getArgument("min", Integer.class);
-        return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.SIMULATION);
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, null, min, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersMinChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, null, min, RuleTarget.CHUNK_TICKING);
     }
 
     public int addPlayersMaxView(CommandContext<ServerCommandSource> ctx) {
@@ -570,6 +638,11 @@ public class ConfigCommandHandler {
     public int addPlayersMaxSim(CommandContext<ServerCommandSource> ctx) {
         Integer max = ctx.getArgument("max", Integer.class);
         return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersMaxChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, null, RuleTarget.CHUNK_TICKING);
     }
 
     public int addPlayersRangeView(CommandContext<ServerCommandSource> ctx) {
@@ -584,6 +657,12 @@ public class ConfigCommandHandler {
         return addRule(ctx, RuleType.PLAYERS, null, max, min, RuleTarget.SIMULATION);
     }
 
+    public int addPlayersRangeChunkTick(CommandContext<ServerCommandSource> ctx) {
+        Integer min = ctx.getArgument("min", Integer.class);
+        Integer max = ctx.getArgument("max", Integer.class);
+        return addRule(ctx, RuleType.PLAYERS, null, max, min, RuleTarget.CHUNK_TICKING);
+    }
+
     public int addPlayersNameView(CommandContext<ServerCommandSource> ctx) {
         String name = ctx.getArgument("names", String.class);
         return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.VIEW);
@@ -592,6 +671,11 @@ public class ConfigCommandHandler {
     public int addPlayersNameSim(CommandContext<ServerCommandSource> ctx) {
         String name = ctx.getArgument("names", String.class);
         return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.SIMULATION);
+    }
+
+    public int addPlayersNameChunkTick(CommandContext<ServerCommandSource> ctx) {
+        String name = ctx.getArgument("names", String.class);
+        return addRule(ctx, RuleType.PLAYERS, name, null, null, RuleTarget.CHUNK_TICKING);
     }
 
     public void registerCommands(LiteralArgumentBuilder<ServerCommandSource> builder) {
@@ -632,6 +716,18 @@ public class ConfigCommandHandler {
                         .executes(this::minSim)
                         .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
                                 .executes(this::setMinSim)
+                        )
+                )
+                .then(CommandManager.literal("max-chunk-tick-distance")
+                        .executes(this::maxChunkTicking)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMaxChunkTicking)
+                        )
+                )
+                .then(CommandManager.literal("min-chunk-tick-distance")
+                        .executes(this::minChunkTicking)
+                        .then(CommandManager.argument("chunks", IntegerArgumentType.integer(2, 32))
+                                .executes(this::setMinChunkTicking)
                         )
                 )
                 .then(CommandManager.literal("broadcast-changes")
@@ -726,6 +822,9 @@ public class ConfigCommandHandler {
                                                 .then(CommandManager.literal("simulation")
                                                         .executes(this::ruleSetTargetSim)
                                                 )
+                                                .then(CommandManager.literal("chunk-tick")
+                                                        .executes(this::ruleSetTargetChunkTick)
+                                                )
                                         )
                                         .then(CommandManager.literal("update-rate")
                                                 .executes(this::ruleUpdateRate)
@@ -785,6 +884,9 @@ public class ConfigCommandHandler {
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addMsptMinSim)
                                                         )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addMsptMinChunkTick)
+                                                        )
                                                 )
                                         )
                                         .then(CommandManager.literal("max")
@@ -795,6 +897,9 @@ public class ConfigCommandHandler {
                                                         )
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addMsptMaxSim)
+                                                        )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addMsptMaxChunkTick)
                                                         )
                                                 )
                                         )
@@ -807,6 +912,9 @@ public class ConfigCommandHandler {
                                                                 )
                                                                 .then(CommandManager.literal("simulation")
                                                                         .executes(this::addMsptRangeSim)
+                                                                )
+                                                                .then(CommandManager.literal("chunk-tick")
+                                                                        .executes(this::addMsptRangeChunkTick)
                                                                 )
                                                         )
                                                 )
@@ -822,6 +930,9 @@ public class ConfigCommandHandler {
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addMemoryMinSim)
                                                         )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addMemoryMinChunkTick)
+                                                        )
                                                 )
                                         )
                                         .then(CommandManager.literal("max")
@@ -832,6 +943,9 @@ public class ConfigCommandHandler {
                                                         )
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addMemoryMaxSim)
+                                                        )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addMemoryMaxChunkTick)
                                                         )
                                                 )
                                         )
@@ -844,6 +958,9 @@ public class ConfigCommandHandler {
                                                                 )
                                                                 .then(CommandManager.literal("simulation")
                                                                         .executes(this::addMemoryRangeSim)
+                                                                )
+                                                                .then(CommandManager.literal("chunk-tick")
+                                                                        .executes(this::addMemoryRangeChunkTick)
                                                                 )
                                                         )
                                                 )
@@ -859,6 +976,9 @@ public class ConfigCommandHandler {
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addPlayersMinSim)
                                                         )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addPlayersMinChunkTick)
+                                                        )
                                                 )
                                         )
                                         .then(CommandManager.literal("max")
@@ -869,6 +989,9 @@ public class ConfigCommandHandler {
                                                         )
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addPlayersMaxSim)
+                                                        )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addPlayersMaxChunkTick)
                                                         )
                                                 )
                                         )
@@ -882,6 +1005,9 @@ public class ConfigCommandHandler {
                                                                 .then(CommandManager.literal("simulation")
                                                                         .executes(this::addPlayersRangeSim)
                                                                 )
+                                                                .then(CommandManager.literal("chunk-tick")
+                                                                        .executes(this::addPlayersRangeChunkTick)
+                                                                )
                                                         )
                                                 )
                                         )
@@ -893,6 +1019,9 @@ public class ConfigCommandHandler {
                                                         )
                                                         .then(CommandManager.literal("simulation")
                                                                 .executes(this::addPlayersNameSim)
+                                                        )
+                                                        .then(CommandManager.literal("chunk-tick")
+                                                                .executes(this::addPlayersNameChunkTick)
                                                         )
                                                 )
                                         )
